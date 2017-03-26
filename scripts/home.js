@@ -144,11 +144,11 @@ const colors = [0xff3b30, 0xff9500, 0xffcc00, 0x4cd964, 0x5ac8fa, 0x007AFF, 0x58
 
 /* Cube Operation */
 function changePivot(x, y, z, obj) {
-  const _wrapper = new THREE.Object3D();
-  _wrapper.position.set(x, y, z);
-  _wrapper.add(obj);
+  const wrapper = new THREE.Object3D();
+  wrapper.position.set(x, y, z);
+  wrapper.add(obj);
   obj.position.set(-x, -y, -z);
-  return _wrapper;
+  return wrapper;
 }
 
 /* init Three.js */
@@ -196,7 +196,7 @@ function addWalls() {
     const materialWall = new THREE.MeshPhongMaterial({
       color: colors[0],
       emissive: 0x072534,
-      // wireframe: true,
+      wireframe: true,
       side: THREE.DoubleSide,
       visible: false,
     });
@@ -244,11 +244,6 @@ function addWalls() {
 function initObject() {
   mesh = new THREE.Object3D();
   const geometryCube = new THREE.CubeGeometry(2, 2, 2, 2, 2, 2);
-  // const materialCube = new THREE.MeshPhongMaterial({
-  //   color: 0x156289,
-  //   emissive: 0x072534,
-  //   wireframe: true,
-  // });
 
   // Create 27 cubes
   for (let x = 1; x <= 5; x += 2) {
@@ -300,6 +295,7 @@ function initObject() {
         }
         const cubemat = new THREE.MultiMaterial(materials);
         const cube = new THREE.Mesh(geometryCube, cubemat);
+        // TODO: 考虑对角块加入圆角
         cube.position.set(x, y, z);
         cube.name = cubeName;
         mesh.add(cube);
@@ -316,7 +312,7 @@ function markUp(_obj) {
   const objInner = _obj;
   console.log(objInner.name);
   for (let i = 0; i < objInner.material.materials.length; i += 1) {
-    objInner.material.materials[i].opacity = 0.5;
+    objInner.material.materials[i].opacity = 0.2;
     objInner.material.materials[i].transparent = true;
   }
 }
