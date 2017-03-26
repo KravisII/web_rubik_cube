@@ -1,10 +1,8 @@
 /* eslint-env browser */
 /* eslint no-console: off, strict: off*/
-/* global THREE, Stats*/
+/* global THREE, Stats */
 
 'use strict';
-
-/* Tool Functions */
 
 /* Stats Function */
 const stats = new Stats();
@@ -19,9 +17,6 @@ let scene;
 let camera;
 let mesh;
 const allCubes = [];
-const colors = [0xff3b30, 0xff9500, 0xffcc00, 0x4cd964, 0x5ac8fa, 0x007AFF, 0x5856D6, 0xFF2C55];
-
-/* Cube Operation */
 
 /* init Three.js */
 function initThree() {
@@ -85,14 +80,14 @@ function initObject() {
   scene.add(mesh);
 }
 
-function markUp(_obj) {
-  _obj.material.color = new THREE.Color(0xFFFFFF);
+function markUp(theObj) {
+  const objInner = theObj;
+  objInner.material.color = new THREE.Color(0xFFFFFF);
 }
 
 function detection() {
-  // 谁碰到我，谁变白
-  let movingCube = allCubes[0];
-  let originPoint = movingCube.position.clone();
+  const movingCube = allCubes[0];
+  const originPoint = movingCube.position.clone();
   for (let i = 0; i < movingCube.geometry.vertices.length; i += 1) {
     const localVertex = movingCube.geometry.vertices[i].clone();
     const globalVertex = localVertex.applyMatrix4(movingCube.matrix);
@@ -104,7 +99,6 @@ function detection() {
       markUp(collisionResults[0].object);
       break;
     }
-    // crash = false;
   }
 }
 
@@ -130,7 +124,6 @@ function startThree() {
 startThree();
 
 document.addEventListener('keydown', (event) => {
-
   const keyName = event.key;
   if (keyName === 'ArrowLeft') {
     event.preventDefault();

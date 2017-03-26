@@ -1,5 +1,5 @@
 /* eslint-env browser */
-/* eslint no-console: off, strict: off, no-param-reassign: off*/
+/* eslint no-console: off, strict: off */
 /* global THREE, Stats*/
 
 'use strict';
@@ -18,44 +18,49 @@ function getCSSValue(element, property) {
 }
 
 function addKeydownEventsFor(_obj) {
+  const innerObj = _obj;
   document.addEventListener('keydown', (event) => {
     const keyName = event.key || event.keyIdentifier;
-    // console.log(keyName);
-    if (keyName === 'ArrowLeft' || keyName === 'Left') {
-      event.preventDefault();
-      _obj.position.x -= 0.2;
-    }
-    if (keyName === 'ArrowRight' || keyName === 'Right') {
-      event.preventDefault();
-      _obj.position.x += 0.2;
-    }
-    if (keyName === 'ArrowUp' || keyName === 'Up') {
-      event.preventDefault();
-      _obj.position.y += 0.2;
-    }
-    if (keyName === 'ArrowDown' || keyName === 'Down') {
-      event.preventDefault();
-      _obj.position.y -= 0.2;
-    }
-    if (keyName === '[' || keyName === 'U+005B') {
-      event.preventDefault();
-      _obj.position.z -= 0.2;
-    }
-    if (keyName === ']' || keyName === 'U+005D') {
-      event.preventDefault();
-      _obj.position.z += 0.2;
-    }
-    if (keyName === 'x') {
-      event.preventDefault();
-      _obj.rotation.x += Math.PI / 180;
-    }
-    if (keyName === 'y') {
-      event.preventDefault();
-      _obj.rotation.y += Math.PI / 180;
-    }
-    if (keyName === 'z') {
-      event.preventDefault();
-      _obj.rotation.z += Math.PI / 180;
+    switch (keyName) {
+      case 'ArrowLeft':
+      case 'Left':
+        event.preventDefault();
+        innerObj.position.x -= 0.2;
+        break;
+      case 'ArrowRight':
+      case 'Right':
+        event.preventDefault();
+        innerObj.position.x += 0.2;
+        break;
+      case 'ArrowUp':
+      case 'Up':
+        event.preventDefault();
+        innerObj.position.y += 0.2;
+        break;
+      case 'ArrowDown':
+      case 'Down':
+        event.preventDefault();
+        innerObj.position.y -= 0.2;
+        break;
+      case '[':
+      case 'U+005B':
+        innerObj.position.z -= 0.2;
+        break;
+      case ']':
+      case 'U+005D':
+        innerObj.position.z += 0.2;
+        break;
+      case 'x':
+        innerObj.rotation.x += Math.PI * 0.1;
+        break;
+      case 'y':
+        innerObj.rotation.y += Math.PI * 0.1;
+        break;
+      case 'z':
+        innerObj.rotation.z += Math.PI * 0.1;
+        break;
+      default:
+        break;
     }
   }, false);
 }
@@ -81,6 +86,9 @@ function faces(faceCode) {
     case 'B':
       color = 'rgb(61, 129, 246)';
       break;
+    case 'N':
+      color = 'rgb(0, 0, 0)';
+      break;
     default:
       break;
   }
@@ -88,7 +96,7 @@ function faces(faceCode) {
   canvas.width = 512;
   canvas.height = 512;
   const ctx = canvas.getContext('2d');
-
+  // Add texture background
   ctx.fillStyle = 'rgba(0,0,0,1)';
   ctx.fillRect(0, 0, 512, 512);
   ctx.rect(71, 71, 370, 370);
@@ -151,7 +159,7 @@ function initThree() {
     canvas: canvasElement,
   });
   renderer.setSize(800, 700);
-  renderer.setClearColor(0x000000);
+  renderer.setClearColor(0xFFFFFF);
   renderer.setPixelRatio(window.devicePixelRatio);
 }
 
@@ -184,7 +192,7 @@ function initLight() {
 
 function addWalls() {
   if (!hasWall) {
-    const geometryWall = new THREE.CubeGeometry(6, 1, 6, 0, 0, 0);
+    const geometryWall = new THREE.CubeGeometry(6, 1, 6);
     const materialWall = new THREE.MeshPhongMaterial({
       color: colors[0],
       emissive: 0x072534,
@@ -236,63 +244,89 @@ function addWalls() {
 function initObject() {
   mesh = new THREE.Object3D();
   const geometryCube = new THREE.CubeGeometry(2, 2, 2, 2, 2, 2);
-  const materialCube = new THREE.MeshPhongMaterial({
-    color: 0x156289,
-    emissive: 0x072534,
-    // wireframe: true,
-  });
+  // const materialCube = new THREE.MeshPhongMaterial({
+  //   color: 0x156289,
+  //   emissive: 0x072534,
+  //   wireframe: true,
+  // });
 
+  // Create 27 cubes
   for (let x = 1; x <= 5; x += 2) {
     for (let y = 1; y <= 5; y += 2) {
       for (let z = 1; z <= 5; z += 2) {
-        const cube = new THREE.Mesh(geometryCube, materialCube.clone());
+        let cubeName = '';
+        const myFaces = [];
+        if (y === 5) {
+          cubeName += 'U';
+          myFaces[2] = faces('U');
+          myFaces[5] = faces('N');
+        }
+        if (x === 1) {
+          cubeName += 'L';
+          myFaces[1] = faces('L');
+          myFaces[0] = faces('N');
+        }
+        if (z === 5) {
+          cubeName += 'F';
+          myFaces[4] = faces('F');
+          myFaces[3] = faces('N');
+        }
+        if (x === 5) {
+          cubeName += 'R';
+          myFaces[0] = faces('R');
+          myFaces[1] = faces('N');
+        }
+        if (y === 1) {
+          cubeName += 'D';
+          myFaces[3] = faces('D');
+          myFaces[2] = faces('N');
+        }
+        if (z === 1) {
+          cubeName += 'B';
+          myFaces[5] = faces('B');
+          myFaces[4] = faces('N');
+        }
+
+        // Create MultiMaterial
+        const materials = [];
+        for (let i = 0; i < 6; i += 1) {
+          const texture = (myFaces[i] === undefined) ?
+            new THREE.Texture(faces('N')) : new THREE.Texture(myFaces[i]);
+          texture.needsUpdate = true;
+          materials.push(new THREE.MeshBasicMaterial({
+            map: texture,
+            name: i,
+          }));
+        }
+        const cubemat = new THREE.MultiMaterial(materials);
+        const cube = new THREE.Mesh(geometryCube, cubemat);
         cube.position.set(x, y, z);
+        cube.name = cubeName;
         mesh.add(cube);
         allCubes.push(cube);
       }
     }
   }
-  const materials = [];
-  const myFaces = [];
-  myFaces.push(faces('U'));
-  myFaces.push(faces('F'));
-  myFaces.push(faces('R'));
-  myFaces.push(faces('D'));
-  myFaces.push(faces('L'));
-  myFaces.push(faces('B'));
-
-  for (let k = 0; k < 6; k += 1) {
-    var texture = new THREE.Texture(myFaces[k]);
-    texture.needsUpdate = true;
-    materials.push(new THREE.MeshBasicMaterial({
-      map: texture,
-    }));
-  }
-
-  const cubemat = new THREE.MultiMaterial(materials);
-  allCubes[2].material = cubemat;
-  // for (var k = 0; k < 6; k++) {
-  //   var texture = new THREE.Texture(myFaces[k]);
-  //   texture.needsUpdate = true;
-  //   materials.push(new THREE.MeshLambertMaterial({
-  //     map: texture
-  //   }));
-  // }
-  // var cubemat = new THREE.MeshFaceMaterial(materials);
-
-
-
-
-
-
-
 
   addWalls();
   scene.add(mesh);
 }
 
 function markUp(_obj) {
-  _obj.material.color = new THREE.Color(0xFFFF00);
+  const objInner = _obj;
+  console.log(objInner.name);
+  for (let i = 0; i < objInner.material.materials.length; i += 1) {
+    objInner.material.materials[i].opacity = 0.5;
+    objInner.material.materials[i].transparent = true;
+  }
+}
+
+function showCurrentArrayContent() {
+  const length = currentArray.length;
+  for (let i = 0; i < length; i += 1) {
+    markUp(currentArray[i]);
+  }
+  return (length);
 }
 
 function detection(dectWall) {
@@ -303,11 +337,12 @@ function detection(dectWall) {
     const directionVector = globalVertex.sub(dectWall.position);
     const ray = new THREE.Raycaster(originPoint, directionVector.clone().normalize());
     const collisionResults = ray.intersectObjects(allCubes, false);
-    if (collisionResults.length > 0 && collisionResults[0].distance < directionVector.length()) {
-      console.log(collisionResults.length);
-      for (let j = 0; j < collisionResults.length; j += 1) {
-        // TODO: 加入到不重复的数组 currentArray
-        markUp(collisionResults[j].object);
+    const resultsLength = collisionResults.length;
+    if (resultsLength > 0) {
+      for (let j = 0; j < resultsLength; j += 1) {
+        if (currentArray.indexOf(collisionResults[j].object) < 0) {
+          currentArray.push(collisionResults[j].object);
+        }
       }
     }
   }
@@ -315,17 +350,11 @@ function detection(dectWall) {
 
 function command(str) {
   switch (str) {
-    case 'T':
+    case 'U':
       currentWall = topWall;
       break;
     case 'F':
       currentWall = frontWall;
-      break;
-    case 'L':
-      currentWall = leftWall;
-      break;
-    case 'B':
-      currentWall = backWall;
       break;
     case 'R':
       currentWall = rightWall;
@@ -333,18 +362,18 @@ function command(str) {
     case 'D':
       currentWall = downWall;
       break;
-    default:
+    case 'L':
+      currentWall = leftWall;
       break;
+    case 'B':
+      currentWall = backWall;
+      break;
+    default:
+      currentWall = null;
+      throw (new TypeError('输入的命令不合法。'));
   }
   detection(currentWall);
-}
-
-function temp() {
-  // console.log(currentArray.length);
-  // console.log(currentArray);
-  for (let _obj of currentArray) {
-    markUp(_obj);
-  }
+  return showCurrentArrayContent();
 }
 
 function render() {
@@ -354,6 +383,7 @@ function render() {
   // mesh.rotation.x += Math.PI / 180 * speed;
   // mesh.rotation.y += Math.PI / 180 * speed;
   // mesh.rotation.z += Math.PI / 180 * speed;
+  // TODO: Rotate camera instead of mesh.
   renderer.render(scene, camera);
 }
 
@@ -368,4 +398,5 @@ function startThree() {
 }
 
 startThree();
-addKeydownEventsFor(allCubes[2]);
+addKeydownEventsFor(allCubes[1]);
+// addKeydownEventsFor(mesh);
