@@ -251,7 +251,6 @@ function initObject() {
         }
         const cubemat = new THREE.MultiMaterial(materials);
         const cube = new THREE.Mesh(geometryCube, cubemat);
-        // TODO: 考虑对角块加入圆角
         cube.position.set(x, y, z);
         cube.name = cubeName;
         mesh.add(cube);
@@ -315,39 +314,39 @@ function remarkUp(_obj) {
   }
 }
 
-function rotateFaceObj(direction) {
-  let array = direction.concat();
+function rotateFaceObj(direction, clockDirection) {
+  const array = direction.concat();
+  const cd = clockDirection ? 1 : -1;
   let group = new THREE.Group();
   for (let i = 0; i < array.length; i += 1) {
     group.add(array[i]);
   }
 
   // TODO: 制作动画
-  // TODO: 制作逆时针
   switch (direction) {
     case leftArray:
       group = changePivot(0, 3, 3, group);
-      group.rotation.x += Math.PI * 0.5;
+      group.rotation.x += cd * (Math.PI * 0.5);
       break;
     case rightArray:
       group = changePivot(5, 3, 3, group);
-      group.rotation.x -= Math.PI * 0.5;
+      group.rotation.x -= cd * (Math.PI * 0.5);
       break;
     case upArray:
       group = changePivot(3, 5, 3, group);
-      group.rotation.y -= Math.PI * 0.5;
+      group.rotation.y -= cd * (Math.PI * 0.5);
       break;
     case downArray:
       group = changePivot(3, 1, 3, group);
-      group.rotation.y += Math.PI * 0.5;
+      group.rotation.y += cd * (Math.PI * 0.5);
       break;
     case frontArray:
       group = changePivot(3, 3, 5, group);
-      group.rotation.z -= Math.PI * 0.5;
+      group.rotation.z -= cd * (Math.PI * 0.5);
       break;
     case backArray:
       group = changePivot(3, 3, 1, group);
-      group.rotation.z += Math.PI * 0.5;
+      group.rotation.z += cd * (Math.PI * 0.5);
       break;
     default:
       break;
@@ -420,11 +419,12 @@ function rotateFace(directionArray, clockDirection) {
     // true: 顺时针
     tempArray = [directionArray[2], directionArray[5], directionArray[8],
       directionArray[1], directionArray[4], directionArray[7],
-      directionArray[0], directionArray[3], directionArray[6]
-    ];
+      directionArray[0], directionArray[3], directionArray[6]];
   } else {
     // false: 逆时针
-    // TODO:
+    tempArray = [directionArray[6], directionArray[3], directionArray[0],
+      directionArray[7], directionArray[4], directionArray[1],
+      directionArray[8], directionArray[5], directionArray[2]];
   }
 
   for (let i = 0; i < 4; i += 1) {
@@ -440,27 +440,27 @@ function rotateFace(directionArray, clockDirection) {
   switch (directionArray) {
     case leftArray:
       leftArray = tempArray.concat();
-      rotateFaceObj(leftArray);
+      rotateFaceObj(leftArray, clockDirection);
       break;
     case rightArray:
       rightArray = tempArray.concat();
-      rotateFaceObj(rightArray);
+      rotateFaceObj(rightArray, clockDirection);
       break;
     case upArray:
       upArray = tempArray.concat();
-      rotateFaceObj(upArray);
+      rotateFaceObj(upArray, clockDirection);
       break;
     case downArray:
       downArray = tempArray.concat();
-      rotateFaceObj(downArray);
+      rotateFaceObj(downArray, clockDirection);
       break;
     case frontArray:
       frontArray = tempArray.concat();
-      rotateFaceObj(frontArray);
+      rotateFaceObj(frontArray, clockDirection);
       break;
     case backArray:
       backArray = tempArray.concat();
-      rotateFaceObj(backArray);
+      rotateFaceObj(backArray, clockDirection);
       break;
     default:
       break;
@@ -474,8 +474,21 @@ function getCubesName(array) {
 }
 
 function command(str) {
+  // TODO: 做成多条命令
+  let facelet = '';
+  let clockDirection = true;
+
+  // 解析单个命令，形如「R」、「R'」，分别表示
+  // 右侧顺时针转动 和 右侧逆时针转动
+  if (str.length === 2) {
+    facelet = str[0];
+    clockDirection = str[1] === "'" ? !clockDirection : true;
+  } else {
+    facelet = str[0];
+  }
+
   let currentArray;
-  switch (str) {
+  switch (facelet) {
     case 'U':
       currentArray = upArray;
       break;
@@ -498,11 +511,7 @@ function command(str) {
       currentArray = [];
       throw (new TypeError('输入的命令不合法。'));
   }
-  rotateFace(currentArray, true);
-  // for (let i = 0; i < currentArray.length; i += 1) {
-  //   markUp(currentArray[i]);
-  // }
-  // rotateFace(str, true);
+  rotateFace(currentArray, clockDirection);
 }
 
 function render() {
@@ -527,7 +536,7 @@ function startThree() {
 }
 
 startThree();
-// command('R');
+// command("L'");
 
-addKeydownEventsFor(allCubes[8]);
+addKeydownEventsFor(allCubes[7]);
 // addKeydownEventsFor(mesh);
