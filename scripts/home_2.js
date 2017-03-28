@@ -13,17 +13,13 @@ let scene;
 let camera;
 let mesh;
 
-let topWall;
-let frontWall;
-let leftWall;
-let backWall;
-let rightWall;
-let downWall;
-let currentWall;
+let upArray = [];
+let frontArray = [];
+let rightArray = [];
+let downArray = [];
+let leftArray = [];
+let backArray = [];
 
-let hasWall = false;
-
-let currentArray = [];
 const allCubes = [];
 
 const speed = 1;
@@ -46,7 +42,6 @@ function addKeydownEventsFor(_obj) {
   const innerObj = _obj;
   document.addEventListener('keydown', (event) => {
     const keyName = event.key || event.keyIdentifier;
-    console.log(keyName);
     switch (keyName) {
       case 'ArrowLeft':
       case 'Left':
@@ -142,7 +137,7 @@ function faces(faceCode) {
   ctx.fill();
   // Add Text Label
   ctx.fillStyle = 'black';
-  ctx.font = `Italic ${300 * faceRatio}px Times New Roman`;
+  ctx.font = `Italic ${200 * faceRatio}px Times New Roman`;
   ctx.fillText(faceCode, 160 * faceRatio, 364 * faceRatio);
   return canvas;
 }
@@ -182,7 +177,6 @@ function initScene() {
 function initCamera() {
   camera = new THREE.PerspectiveCamera(45, 8 / 7, 1, 50);
   camera.position.set(-6, 12, 16);
-  // camera.position.set(12, -12, 16);
   camera.lookAt({ x: 3, y: 3, z: 3 });
   scene.add(camera);
 }
@@ -200,57 +194,6 @@ function initLight() {
   scene.add(lights[0]);
   scene.add(lights[1]);
   scene.add(lights[2]);
-}
-
-function addWalls() {
-  if (!hasWall) {
-    const geometryWall = new THREE.CubeGeometry(6, 1, 6);
-    const materialWall = new THREE.MeshPhongMaterial({
-      color: colors[0],
-      emissive: 0x072534,
-      wireframe: true,
-      side: THREE.DoubleSide,
-      visible: false,
-    });
-    topWall = new THREE.Mesh(geometryWall, materialWall);
-    topWall.position.set(3, 6, 3);
-    topWall.rotation.x = Math.PI;
-    topWall.name = 'topWall';
-
-    frontWall = new THREE.Mesh(geometryWall, materialWall);
-    frontWall.position.set(3, 3, 6);
-    frontWall.rotation.x = Math.PI * 0.5;
-    frontWall.name = 'frontWall';
-
-    leftWall = new THREE.Mesh(geometryWall, materialWall);
-    leftWall.position.set(0, 3, 3);
-    leftWall.rotation.z = Math.PI * 0.5;
-    leftWall.name = 'leftWall';
-
-    backWall = new THREE.Mesh(geometryWall, materialWall);
-    backWall.position.set(3, 3, 0);
-    backWall.rotation.x = Math.PI * 0.5;
-    backWall.name = 'backWall';
-
-    rightWall = new THREE.Mesh(geometryWall, materialWall);
-    rightWall.position.set(6, 3, 3);
-    rightWall.rotation.z = Math.PI * 0.5;
-    rightWall.name = 'rightWall';
-
-    downWall = new THREE.Mesh(geometryWall, materialWall);
-    downWall.position.set(3, 0, 3);
-    downWall.rotation.x = Math.PI;
-    downWall.name = 'downWall';
-
-    // 需要将碰撞墙加在 scene 中，加入 mesh 会特别诡异
-    scene.add(topWall);
-    scene.add(frontWall);
-    scene.add(leftWall);
-    scene.add(backWall);
-    scene.add(rightWall);
-    scene.add(downWall);
-    hasWall = true;
-  }
 }
 
 function initObject() {
@@ -317,7 +260,41 @@ function initObject() {
     }
   }
 
-  addWalls();
+  // Create 6 faces array
+  for (let i = 0; i <= 8; i += 1) {
+    leftArray.push(allCubes[i]);
+  }
+
+  for (let i = 8; i >= 6; i -= 1) {
+    for (let j = 0; j <= 18; j += 9) {
+      upArray.push(allCubes[i + j]);
+    }
+  }
+
+  for (let i = 2; i <= 8; i += 3) {
+    for (let j = 0; j <= 18; j += 9) {
+      frontArray.push(allCubes[i + j]);
+    }
+  }
+
+  for (let i = 18; i <= 24; i += 3) {
+    for (let j = 0; j >= -18; j -= 9) {
+      backArray.push(allCubes[i + j]);
+    }
+  }
+
+  for (let i = 0; i <= 2; i += 1) {
+    for (let j = 0; j <= 18; j += 9) {
+      downArray.push(allCubes[i + j]);
+    }
+  }
+
+  for (let i = 20; i <= 26; i += 3) {
+    for (let j = 0; j >= -2; j -= 1) {
+      rightArray.push(allCubes[i + j]);
+    }
+  }
+
   scene.add(mesh);
 }
 
@@ -332,49 +309,50 @@ function markUp(_obj) {
 
 function remarkUp(_obj) {
   const objInner = _obj;
-  console.log(objInner.name);
   for (let i = 0; i < objInner.material.materials.length; i += 1) {
     objInner.material.materials[i].opacity = 1;
     objInner.material.materials[i].transparent = false;
   }
 }
 
-function showCurrentArrayContent() {
-  const length = currentArray.length;
-  for (let i = 0; i < length; i += 1) {
-    markUp(currentArray[i]);
-  }
-  return (length);
-}
-
-function detection(dectWall) {
-  // 使用碰撞检测识别
-  const originPoint = dectWall.position.clone();
-  for (let i = 0; i < dectWall.geometry.vertices.length; i += 1) {
-    const localVertex = dectWall.geometry.vertices[i].clone();
-    const globalVertex = localVertex.applyMatrix4(dectWall.matrix);
-    const directionVector = globalVertex.sub(dectWall.position);
-    const ray = new THREE.Raycaster(originPoint, directionVector.clone().normalize());
-    const collisionResults = ray.intersectObjects(allCubes, false);
-    const resultsLength = collisionResults.length;
-    if (resultsLength > 0) {
-      for (let j = 0; j < resultsLength; j += 1) {
-        if (currentArray.indexOf(collisionResults[j].object) < 0) {
-          currentArray.push(collisionResults[j].object);
-          console.log(currentArray.length);
-        }
-      }
-    }
-  }
-}
-
-function rotateFace(array) {
+function rotateFaceObj(direction) {
+  let array = direction.concat();
   let group = new THREE.Group();
   for (let i = 0; i < array.length; i += 1) {
     group.add(array[i]);
   }
-  group = changePivot(0, 3, 3, group);
-  group.rotation.x = Math.PI * 0.5;
+
+  // TODO: 制作动画
+  // TODO: 制作逆时针
+  switch (direction) {
+    case leftArray:
+      group = changePivot(0, 3, 3, group);
+      group.rotation.x += Math.PI * 0.5;
+      break;
+    case rightArray:
+      group = changePivot(5, 3, 3, group);
+      group.rotation.x -= Math.PI * 0.5;
+      break;
+    case upArray:
+      group = changePivot(3, 5, 3, group);
+      group.rotation.y -= Math.PI * 0.5;
+      break;
+    case downArray:
+      group = changePivot(3, 1, 3, group);
+      group.rotation.y += Math.PI * 0.5;
+      break;
+    case frontArray:
+      group = changePivot(3, 3, 5, group);
+      group.rotation.z -= Math.PI * 0.5;
+      break;
+    case backArray:
+      group = changePivot(3, 3, 1, group);
+      group.rotation.z += Math.PI * 0.5;
+      break;
+    default:
+      break;
+  }
+
   scene.add(group);
   group.updateMatrixWorld();
   for (let i = 0; i < 9; i += 1) {
@@ -385,39 +363,146 @@ function rotateFace(array) {
       cube.getWorldPosition().z);
     cube.setRotationFromEuler(cube.getWorldRotation());
     mesh.add(cube);
-    remarkUp(cube);
   }
   scene.remove(group);
 }
 
-function command(str) {
-  switch (str) {
-    case 'U':
-      currentWall = topWall;
+// 使用数组记录不同面
+function rotateFace(directionArray, clockDirection) {
+  // clockDirection:
+  // false: 逆时针
+  // true: 顺时针
+  let neighbors = [];
+  // 0: top, 1: right, 2: down, 3: left
+  switch (directionArray) {
+    case leftArray:
+      neighbors.push(upArray);
+      neighbors.push(frontArray);
+      neighbors.push(downArray);
+      neighbors.push(backArray);
       break;
-    case 'F':
-      currentWall = frontWall;
+    case upArray:
+      neighbors.push(backArray);
+      neighbors.push(rightArray);
+      neighbors.push(frontArray);
+      neighbors.push(leftArray);
       break;
-    case 'R':
-      currentWall = rightWall;
+    case frontArray:
+      neighbors.push(upArray);
+      neighbors.push(rightArray);
+      neighbors.push(downArray);
+      neighbors.push(leftArray);
       break;
-    case 'D':
-      currentWall = downWall;
+    case rightArray:
+      neighbors.push(upArray);
+      neighbors.push(backArray);
+      neighbors.push(downArray);
+      neighbors.push(frontArray);
       break;
-    case 'L':
-      currentWall = leftWall;
+    case downArray:
+      neighbors.push(frontArray);
+      neighbors.push(rightArray);
+      neighbors.push(backArray);
+      neighbors.push(leftArray);
       break;
-    case 'B':
-      currentWall = backWall;
+    case backArray:
+      neighbors.push(upArray);
+      neighbors.push(leftArray);
+      neighbors.push(downArray);
+      neighbors.push(rightArray);
       break;
     default:
-      currentWall = null;
+      throw new TypeError(`${directionArray} is not a direction array.`);
+  }
+
+  let tempArray;
+  if (clockDirection) {
+    // true: 顺时针
+    tempArray = [directionArray[2], directionArray[5], directionArray[8],
+      directionArray[1], directionArray[4], directionArray[7],
+      directionArray[0], directionArray[3], directionArray[6]
+    ];
+  } else {
+    // false: 逆时针
+    // TODO:
+  }
+
+  for (let i = 0; i < 4; i += 1) {
+    const neighbor = neighbors[i].concat();
+    for (let j = 0; j < 9; j += 1) {
+      const index = neighbor.indexOf(directionArray[j]);
+      if (index >= 0) {
+        neighbors[i][index] = tempArray[j];
+      }
+    }
+  }
+
+  switch (directionArray) {
+    case leftArray:
+      leftArray = tempArray.concat();
+      rotateFaceObj(leftArray);
+      break;
+    case rightArray:
+      rightArray = tempArray.concat();
+      rotateFaceObj(rightArray);
+      break;
+    case upArray:
+      upArray = tempArray.concat();
+      rotateFaceObj(upArray);
+      break;
+    case downArray:
+      downArray = tempArray.concat();
+      rotateFaceObj(downArray);
+      break;
+    case frontArray:
+      frontArray = tempArray.concat();
+      rotateFaceObj(frontArray);
+      break;
+    case backArray:
+      backArray = tempArray.concat();
+      rotateFaceObj(backArray);
+      break;
+    default:
+      break;
+  }
+}
+
+function getCubesName(array) {
+  for (let i = 0; i < array.length; i += 1) {
+    console.log(i, array[i].name);
+  }
+}
+
+function command(str) {
+  let currentArray;
+  switch (str) {
+    case 'U':
+      currentArray = upArray;
+      break;
+    case 'F':
+      currentArray = frontArray;
+      break;
+    case 'R':
+      currentArray = rightArray;
+      break;
+    case 'D':
+      currentArray = downArray;
+      break;
+    case 'L':
+      currentArray = leftArray;
+      break;
+    case 'B':
+      currentArray = backArray;
+      break;
+    default:
+      currentArray = [];
       throw (new TypeError('输入的命令不合法。'));
   }
-  detection(currentWall);
-  console.log(showCurrentArrayContent());
-  rotateFace(currentArray);
-  // return showCurrentArrayContent();
+  rotateFace(currentArray, true);
+  // for (let i = 0; i < currentArray.length; i += 1) {
+  //   markUp(currentArray[i]);
+  // }
+  // rotateFace(str, true);
 }
 
 function render() {
@@ -442,7 +527,7 @@ function startThree() {
 }
 
 startThree();
-command('L');
+// command('R');
 
-// addKeydownEventsFor(allCubes[1]);
+addKeydownEventsFor(allCubes[8]);
 // addKeydownEventsFor(mesh);
