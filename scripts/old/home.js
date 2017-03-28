@@ -1,6 +1,7 @@
 /* eslint-env browser */
 /* eslint no-console: off, strict: off */
 /* global THREE, Stats*/
+// 使用碰撞检测确定旋转面
 
 'use strict';
 

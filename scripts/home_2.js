@@ -1,6 +1,7 @@
 /* eslint-env browser */
 /* eslint no-console: off, strict: off */
 /* global THREE, Stats*/
+// 使用数组记录旋转面
 
 'use strict';
 
@@ -89,6 +90,75 @@ function addKeydownEventsFor(_obj) {
   }, false);
 }
 
+function markUpCube(_obj) {
+  const objInner = _obj;
+  for (let i = 0; i < objInner.material.materials.length; i += 1) {
+    objInner.material.materials[i].opacity = 0.2;
+    objInner.material.materials[i].transparent = true;
+  }
+}
+
+function remarkUpCube(_obj) {
+  const objInner = _obj;
+  for (let i = 0; i < objInner.material.materials.length; i += 1) {
+    // objInner.material.materials[i].opacity = 1;
+    objInner.material.materials[i].transparent = false;
+  }
+}
+
+/* Stats Function */
+const stats = new Stats();
+(() => {
+  document.body.appendChild(stats.domElement);
+})();
+
+/* Cube Operation */
+function changePivot(x, y, z, obj) {
+  const wrapper = new THREE.Object3D();
+  wrapper.position.set(x, y, z);
+  wrapper.add(obj);
+  obj.position.set(-x, -y, -z);
+  return wrapper;
+}
+
+/* init Three.js */
+function initThree() {
+  canvasElement = document.querySelector('.main-canvas');
+  renderer = new THREE.WebGLRenderer({
+    antialiasing: true,
+    canvas: canvasElement,
+  });
+  renderer.setSize(800, 700);
+  renderer.setClearColor(0xFFFFFF);
+  renderer.setPixelRatio(window.devicePixelRatio);
+}
+
+function initScene() {
+  scene = new THREE.Scene();
+}
+
+function initCamera() {
+  camera = new THREE.PerspectiveCamera(45, 8 / 7, 1, 50);
+  camera.position.set(-6, 12, 16);
+  camera.lookAt({ x: 3, y: 3, z: 3 });
+  scene.add(camera);
+}
+
+function initLight() {
+  const lights = [];
+  lights[0] = new THREE.PointLight(0xffffff, 1, 0);
+  lights[1] = new THREE.PointLight(0xffffff, 1, 0);
+  lights[2] = new THREE.PointLight(0xffffff, 1, 0);
+
+  lights[0].position.set(0, 200, 0);
+  lights[1].position.set(100, 200, 100);
+  lights[2].position.set(-100, -200, -100);
+
+  scene.add(lights[0]);
+  scene.add(lights[1]);
+  scene.add(lights[2]);
+}
+
 function faces(faceCode) {
   let color = 'rgb(0, 0, 0)';
   switch (faceCode) {
@@ -142,65 +212,8 @@ function faces(faceCode) {
   return canvas;
 }
 
-/* Stats Function */
-const stats = new Stats();
-(() => {
-  document.body.appendChild(stats.domElement);
-})();
-
-/* Cube Operation */
-function changePivot(x, y, z, obj) {
-  const wrapper = new THREE.Object3D();
-  wrapper.position.set(x, y, z);
-  wrapper.add(obj);
-  obj.position.set(-x, -y, -z);
-  return wrapper;
-}
-
-/* init Three.js */
-function initThree() {
-  canvasElement = document.querySelector('.main-canvas');
-  renderer = new THREE.WebGLRenderer({
-    antialiasing: true,
-    canvas: canvasElement,
-  });
-  renderer.setSize(800, 700);
-  renderer.setClearColor(0xFFFFFF);
-  // renderer.setPixelRatio(window.devicePixelRatio);
-  renderer.setPixelRatio(4);
-}
-
-function initScene() {
-  scene = new THREE.Scene();
-}
-
-function initCamera() {
-  camera = new THREE.PerspectiveCamera(45, 8 / 7, 1, 50);
-  camera.position.set(-6, 12, 16);
-  camera.lookAt({ x: 3, y: 3, z: 3 });
-  scene.add(camera);
-}
-
-function initLight() {
-  const lights = [];
-  lights[0] = new THREE.PointLight(0xffffff, 1, 0);
-  lights[1] = new THREE.PointLight(0xffffff, 1, 0);
-  lights[2] = new THREE.PointLight(0xffffff, 1, 0);
-
-  lights[0].position.set(0, 200, 0);
-  lights[1].position.set(100, 200, 100);
-  lights[2].position.set(-100, -200, -100);
-
-  scene.add(lights[0]);
-  scene.add(lights[1]);
-  scene.add(lights[2]);
-}
-
-function initObject() {
-  mesh = new THREE.Object3D();
-  const geometryCube = new THREE.CubeGeometry(2, 2, 2, 2, 2, 2);
-
-  // Create 27 cubes
+function createCubes() {
+  const geometryCube = new THREE.CubeGeometry(2, 2, 2);
   for (let x = 1; x <= 5; x += 2) {
     for (let y = 1; y <= 5; y += 2) {
       for (let z = 1; z <= 5; z += 2) {
@@ -258,8 +271,9 @@ function initObject() {
       }
     }
   }
+}
 
-  // Create 6 faces array
+function createFacelets() {
   for (let i = 0; i <= 8; i += 1) {
     leftArray.push(allCubes[i]);
   }
@@ -293,25 +307,15 @@ function initObject() {
       rightArray.push(allCubes[i + j]);
     }
   }
+}
 
+function initObject() {
+  mesh = new THREE.Object3D();
+  // Create 27 cubes
+  createCubes();
+  // Create 6 facelets
+  createFacelets();
   scene.add(mesh);
-}
-
-function markUp(_obj) {
-  const objInner = _obj;
-  // console.log(objInner.name);
-  for (let i = 0; i < objInner.material.materials.length; i += 1) {
-    objInner.material.materials[i].opacity = 0.2;
-    objInner.material.materials[i].transparent = true;
-  }
-}
-
-function remarkUp(_obj) {
-  const objInner = _obj;
-  for (let i = 0; i < objInner.material.materials.length; i += 1) {
-    objInner.material.materials[i].opacity = 1;
-    objInner.material.materials[i].transparent = false;
-  }
 }
 
 function rotateFaceObj(direction, clockDirection) {
@@ -419,12 +423,14 @@ function rotateFace(directionArray, clockDirection) {
     // true: 顺时针
     tempArray = [directionArray[2], directionArray[5], directionArray[8],
       directionArray[1], directionArray[4], directionArray[7],
-      directionArray[0], directionArray[3], directionArray[6]];
+      directionArray[0], directionArray[3], directionArray[6]
+    ];
   } else {
     // false: 逆时针
     tempArray = [directionArray[6], directionArray[3], directionArray[0],
       directionArray[7], directionArray[4], directionArray[1],
-      directionArray[8], directionArray[5], directionArray[2]];
+      directionArray[8], directionArray[5], directionArray[2]
+    ];
   }
 
   for (let i = 0; i < 4; i += 1) {
@@ -474,7 +480,6 @@ function getCubesName(array) {
 }
 
 function command(str) {
-  // TODO: 做成多条命令
   let facelet = '';
   let clockDirection = true;
 
@@ -514,6 +519,19 @@ function command(str) {
   rotateFace(currentArray, clockDirection);
 }
 
+function commands(str) {
+  // 解析多个命令，形如「R L U2」。
+  const orders = str.split(' ');
+  for (let i = 0; i < orders.length; i += 1) {
+    if (orders[i][1] === '2') {
+      command(orders[i][0]);
+      command(orders[i][0]);
+    } else {
+      command(orders[i]);
+    }
+  }
+}
+
 function render() {
   stats.begin();
   requestAnimationFrame(render);
@@ -536,7 +554,6 @@ function startThree() {
 }
 
 startThree();
-// command("L'");
 
 addKeydownEventsFor(allCubes[7]);
 // addKeydownEventsFor(mesh);
