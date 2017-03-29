@@ -1,18 +1,20 @@
 /* eslint-env browser */
 /* eslint no-console: off, strict: off */
-/* global THREE, Stats*/
+/* global THREE, TWEEN, Stats*/
 // 使用数组记录旋转面
 
 'use strict';
 
 /* Global Values */
-const faceRatio = 1;
+const faceRatio = 0.5;
 
 let canvasElement;
 let renderer;
 let scene;
 let camera;
 let mesh;
+let theCube;
+let group;
 
 let upArray = [];
 let frontArray = [];
@@ -21,8 +23,14 @@ let downArray = [];
 let leftArray = [];
 let backArray = [];
 
-const allCubes = [];
+let queue = [];
 
+const allCubes = [];
+let loopID;
+
+let isRotating = false;
+
+const duration = 800;
 const speed = 1;
 const colors = [0xff3b30, 0xff9500, 0xffcc00, 0x4cd964, 0x5ac8fa, 0x007AFF, 0x5856D6, 0xFF2C55];
 
@@ -101,7 +109,6 @@ function markUpCube(_obj) {
 function remarkUpCube(_obj) {
   const objInner = _obj;
   for (let i = 0; i < objInner.material.materials.length; i += 1) {
-    // objInner.material.materials[i].opacity = 1;
     objInner.material.materials[i].transparent = false;
   }
 }
@@ -129,7 +136,7 @@ function initThree() {
     canvas: canvasElement,
   });
   renderer.setSize(800, 700);
-  renderer.setClearColor(0xFFFFFF);
+  renderer.setClearColor(0xffffff);
   renderer.setPixelRatio(window.devicePixelRatio);
 }
 
@@ -166,10 +173,10 @@ function faces(faceCode) {
       color = 'rgb(255, 255, 255)';
       break;
     case 'F':
-      color = 'rgb(0, 157, 84)';
+      color = 'rgb(2, 189, 86)';
       break;
     case 'R':
-      color = 'rgb(220, 66, 47)';
+      color = 'rgb(255, 0, 22)';
       break;
     case 'D':
       color = 'rgb(253, 204, 9)';
@@ -178,10 +185,10 @@ function faces(faceCode) {
       color = 'rgb(255, 108, 0)';
       break;
     case 'B':
-      color = 'rgb(61, 129, 246)';
+      color = 'rgb(0, 122, 255)';
       break;
     case 'N':
-      color = 'rgb(0, 0, 0)';
+      color = 'rgba(0, 0, 0, 0)';
       break;
     default:
       break;
@@ -315,59 +322,125 @@ function initObject() {
   createCubes();
   // Create 6 facelets
   createFacelets();
-  scene.add(mesh);
+
+  theCube = changePivot(3, 3, 3, mesh);
+  scene.add(theCube);
 }
 
 function rotateFaceObj(direction, clockDirection) {
+  // if (isRotating) {
+  //   return;
+  // }
+
   const array = direction.concat();
   const cd = clockDirection ? 1 : -1;
-  let group = new THREE.Group();
+  group = new THREE.Group();
   for (let i = 0; i < array.length; i += 1) {
     group.add(array[i]);
   }
 
-  // TODO: 制作动画
   switch (direction) {
     case leftArray:
       group = changePivot(0, 3, 3, group);
-      group.rotation.x += cd * (Math.PI * 0.5);
       break;
     case rightArray:
       group = changePivot(5, 3, 3, group);
-      group.rotation.x -= cd * (Math.PI * 0.5);
       break;
     case upArray:
       group = changePivot(3, 5, 3, group);
-      group.rotation.y -= cd * (Math.PI * 0.5);
       break;
     case downArray:
       group = changePivot(3, 1, 3, group);
-      group.rotation.y += cd * (Math.PI * 0.5);
       break;
     case frontArray:
       group = changePivot(3, 3, 5, group);
-      group.rotation.z -= cd * (Math.PI * 0.5);
       break;
     case backArray:
       group = changePivot(3, 3, 1, group);
-      group.rotation.z += cd * (Math.PI * 0.5);
       break;
     default:
       break;
   }
 
   scene.add(group);
-  group.updateMatrixWorld();
-  for (let i = 0; i < 9; i += 1) {
-    const cube = array.pop();
-    cube.position.set(
-      cube.getWorldPosition().x,
-      cube.getWorldPosition().y,
-      cube.getWorldPosition().z);
-    cube.setRotationFromEuler(cube.getWorldRotation());
-    mesh.add(cube);
+
+  const tween = new TWEEN.Tween(group.rotation);
+  switch (direction) {
+    case leftArray:
+      tween.to({
+        x: +(cd * (Math.PI * 0.5)),
+      }, duration);
+      break;
+    case rightArray:
+      tween.to({
+        x: -(cd * (Math.PI * 0.5)),
+      }, duration);
+      break;
+    case upArray:
+      tween.to({
+        y: -(cd * (Math.PI * 0.5)),
+      }, duration);
+      break;
+    case downArray:
+      tween.to({
+        y: +(cd * (Math.PI * 0.5)),
+      }, duration);
+      break;
+    case frontArray:
+      tween.to({
+        z: -(cd * (Math.PI * 0.5)),
+      }, duration);
+      break;
+    case backArray:
+      tween.to({
+        z: +(cd * (Math.PI * 0.5)),
+      }, duration);
+      break;
+    default:
+      break;
   }
-  scene.remove(group);
+  tween.easing(TWEEN.Easing.Quartic.Out);
+
+  tween.onUpdate(() => { isRotating = true; });
+
+  tween.onComplete(() => {
+    isRotating = false;
+    switch (direction) {
+      case leftArray:
+        group.rotation.x = +(cd * (Math.PI * 0.5));
+        break;
+      case rightArray:
+        group.rotation.x = -(cd * (Math.PI * 0.5));
+        break;
+      case upArray:
+        group.rotation.y = -(cd * (Math.PI * 0.5));
+        break;
+      case downArray:
+        group.rotation.y = +(cd * (Math.PI * 0.5));
+        break;
+      case frontArray:
+        group.rotation.z = -(cd * (Math.PI * 0.5));
+        break;
+      case backArray:
+        group.rotation.z = +(cd * (Math.PI * 0.5));
+        break;
+      default:
+        break;
+    }
+    // group.updateMatrixWorld();
+    for (let i = 0; i < 9; i += 1) {
+      const cube = array.pop();
+      cube.position.set(
+        cube.getWorldPosition().x,
+        cube.getWorldPosition().y,
+        cube.getWorldPosition().z);
+      cube.setRotationFromEuler(cube.getWorldRotation());
+      mesh.add(cube);
+    }
+    scene.remove(group);
+    doQueue();
+  });
+  tween.start();
 }
 
 // 使用数组记录不同面
@@ -519,28 +592,51 @@ function command(str) {
   rotateFace(currentArray, clockDirection);
 }
 
-function commands(str) {
-  // 解析多个命令，形如「R L U2」。
-  const orders = str.split(' ');
-  for (let i = 0; i < orders.length; i += 1) {
-    if (orders[i][1] === '2') {
-      command(orders[i][0]);
-      command(orders[i][0]);
-    } else {
-      command(orders[i]);
-    }
+function doQueue() {
+  if (isRotating) {
+    return;
+  }
+  const singleCommand = queue.shift();
+  if (singleCommand !== undefined) {
+    command(singleCommand);
+  } else {
+    console.log('Command queue is empty now.');
   }
 }
 
-function render() {
+function commands(str) {
+  // 解析多个命令，形如「R L U2」。
+  const tempQueue = str.split(' ');
+
+  for (let i = 0; i < tempQueue.length; i += 1) {
+    if (tempQueue[i].length === 2 && tempQueue[i][1] === '2') {
+      tempQueue.splice(i, 1, tempQueue[i][0], tempQueue[i][0]);
+    }
+  }
+
+  queue = queue.concat(tempQueue);
+  doQueue();
+}
+
+function loop() {
   stats.begin();
-  requestAnimationFrame(render);
-  stats.end();
-  // mesh.rotation.x += Math.PI / 180 * speed;
-  // mesh.rotation.y += Math.PI / 180 * speed;
-  // mesh.rotation.z += Math.PI / 180 * speed;
-  // TODO: Rotate camera instead of mesh.
+
+  loopID = requestAnimationFrame(loop);
+  TWEEN.update();
   renderer.render(scene, camera);
+
+  (() => {
+    if (autoRotate) {
+      theCube.rotation.x -= Math.PI * 0.01;
+      theCube.rotation.y -= Math.PI * 0.001;
+      theCube.rotation.z -= Math.PI * 0.01;
+    }
+  })();
+  stats.end();
+}
+
+function cancelLoop() {
+  cancelAnimationFrame(loopID);
 }
 
 function startThree() {
@@ -550,10 +646,11 @@ function startThree() {
   initLight();
   initObject();
   renderer.clear();
-  render();
+  loop();
 }
 
+// let autoRotate = true;
+let autoRotate = false;
 startThree();
-
 addKeydownEventsFor(allCubes[7]);
 // addKeydownEventsFor(mesh);
