@@ -4,7 +4,9 @@
 // 使用数组记录旋转面
 // TODO: 添加面小块标记
 // TODO: 检测是否还原
-// TODO: 添加照相机移动轨迹
+// TODO: 添加照相机移动轨迹，90度旋转
+// TODO: 对 requestAnimationFrame 的改进（魔方崩坏）
+// TODO: MVC 分离
 
 'use strict';
 
@@ -36,7 +38,7 @@ let isRotating = false;
 // let autoRotate = true;
 let autoRotate = false;
 
-let duration = 40;
+let duration = 200;
 
 // const colors = [0xff3b30, 0xff9500, 0xffcc00, 0x4cd964, 0x5ac8fa, 0x007AFF, 0x5856D6, 0xFF2C55];
 
@@ -84,7 +86,7 @@ function cameraTest() {
           // y: 12,
           // z: 12,
         }, 1000);
-        tween.onUpdate((e) => {
+        tween.onUpdate(() => {
           time += 1;
           dummy.lookAt({ x: 3, y: 3, z: 3 });
           dummy.position.x = (Math.cos(time / 100) * 15) + 3;
@@ -475,40 +477,24 @@ function rotateFaceObj(direction, clockDirection) {
   }
   tween.easing(TWEEN.Easing.Quartic.Out);
 
-  tween.onUpdate(() => { isRotating = true; });
+  tween.onStart(() => {
+    isRotating = true;
+    console.log('start');
+  });
+
+  tween.onUpdate(() => {});
 
   tween.onComplete(() => {
     isRotating = false;
-    switch (direction) {
-      case leftArray:
-        group.rotation.x = +(cd * (Math.PI * 0.5));
-        break;
-      case rightArray:
-        group.rotation.x = -(cd * (Math.PI * 0.5));
-        break;
-      case upArray:
-        group.rotation.y = -(cd * (Math.PI * 0.5));
-        break;
-      case downArray:
-        group.rotation.y = +(cd * (Math.PI * 0.5));
-        break;
-      case frontArray:
-        group.rotation.z = -(cd * (Math.PI * 0.5));
-        break;
-      case backArray:
-        group.rotation.z = +(cd * (Math.PI * 0.5));
-        break;
-      default:
-        break;
-    }
-    // group.updateMatrixWorld();
     for (let i = 0; i < 9; i += 1) {
       const cube = array.pop();
       cube.position.set(
-        cube.getWorldPosition().x,
-        cube.getWorldPosition().y,
-        cube.getWorldPosition().z);
-      cube.setRotationFromEuler(cube.getWorldRotation());
+        Math.round(cube.getWorldPosition().x),
+        Math.round(cube.getWorldPosition().y),
+        Math.round(cube.getWorldPosition().z));
+      cube.setRotationFromMatrix(cube.matrixWorld);
+
+      // cube.setRotationFromEuler(cube.getWorldRotation());
       mesh.add(cube);
     }
     scene.remove(group);
@@ -638,7 +624,6 @@ function command(str) {
   } else {
     facelet = str[0];
   }
-
   let currentArray;
   switch (facelet) {
     case 'U':
@@ -681,7 +666,7 @@ function doQueue() {
 function commands(str) {
   // 解析多个命令，形如「R L U2」。
   const tempQueue = str.split(' ');
-
+  console.log(tempQueue);
   for (let i = 0; i < tempQueue.length; i += 1) {
     if (tempQueue[i].length === 2 && tempQueue[i][1] === '2') {
       tempQueue.splice(i, 1, tempQueue[i][0], tempQueue[i][0]);
@@ -700,13 +685,14 @@ function loop() {
   renderer.render(scene, camera);
   // renderer.render(scene, dummy.children[0]);
 
-  (() => {
-    if (autoRotate) {
-      theCube.rotation.x -= Math.PI * 0.001;
-      theCube.rotation.y -= Math.PI * 0.001;
-      theCube.rotation.z -= Math.PI * 0.001;
-    }
-  })();
+  // (() => {
+  //   if (autoRotate) {
+  //     theCube.rotation.x -= Math.PI * 0.001;
+  //     theCube.rotation.y -= Math.PI * 0.001;
+  //     theCube.rotation.z -= Math.PI * 0.001;
+  //   }
+  // })();
+
   stats.end();
 }
 
@@ -737,14 +723,14 @@ function getRandomIntInclusive(min, max) {
 }
 
 function randomCube(steps) {
-  const commandArray = ['U', 'F', 'R', 'D', 'L', 'B', "U'", "F'", "R'", "D'", "L'", "B'"];
-  let commandStr = '';
+  const commandFlags = ['U', 'F', 'R', 'D', 'L', 'B', "U'", "F'", "R'", "D'", "L'", "B'"];
+  const commandArray = [];
   for (let i = 0; i < steps; i += 1) {
-    const indexRandom = getRandomIntInclusive(0, commandArray.length - 1);
-    commandStr += commandArray[indexRandom] + ' ';
+    const indexRandom = getRandomIntInclusive(0, commandFlags.length - 1);
+    commandArray.push(commandFlags[indexRandom]);
   }
-  return (commandStr);
+  return (commandArray.join(' '));
 }
 
-commands(randomCube(10000));
+commands(randomCube(1000));
 
