@@ -2,6 +2,9 @@
 /* eslint no-console: off, strict: off */
 /* global THREE, TWEEN, Stats*/
 // 使用数组记录旋转面
+// TODO: 添加面小块标记
+// TODO: 检测是否还原
+// TODO: 添加照相机移动轨迹
 
 'use strict';
 
@@ -11,6 +14,7 @@ const faceRatio = 0.5;
 let canvasElement;
 let renderer;
 let scene;
+let dummy;
 let camera;
 let mesh;
 let theCube;
@@ -29,10 +33,12 @@ const allCubes = [];
 let loopID;
 
 let isRotating = false;
+// let autoRotate = true;
+let autoRotate = false;
 
-const duration = 800;
-const speed = 1;
-const colors = [0xff3b30, 0xff9500, 0xffcc00, 0x4cd964, 0x5ac8fa, 0x007AFF, 0x5856D6, 0xFF2C55];
+let duration = 40;
+
+// const colors = [0xff3b30, 0xff9500, 0xffcc00, 0x4cd964, 0x5ac8fa, 0x007AFF, 0x5856D6, 0xFF2C55];
 
 /* Tool Function */
 function getCSSValue(element, property) {
@@ -45,6 +51,78 @@ function getCSSValue(element, property) {
 
   const valueStr = window.getComputedStyle(element, null)[property];
   return (parseInt(valueStr, 10));
+}
+
+function cameraTest() {
+  let time = 0;
+  // document.addEventListener('keydown', (event) => {
+    // 轨迹方程（设 y = 3 为中心轴）
+    // var origin = camera.position.clone();
+    // var alpha = Math.atan((origin.z - 3) / (origin.x - 3));
+    // var x = (Math.cos(alpha + (Math.PI / 2)) * 15) + 3;
+    // var z = (Math.sin(alpha + (Math.PI / 2)) * 15) + 3;
+
+
+    // const keyName = event.key || event.keyIdentifier;
+    // switch (keyName) {
+    //   case 'o':
+        // let alpha = Math.atan((origin.z - 3) / (origin.x - 3));
+        let dummy = new THREE.Group;
+
+        dummy.add(camera);
+        scene.add(dummy);
+
+        camera.position.set(0, 0, 0);
+        camera.rotation.set(-Math.PI, 0, -Math.PI);
+
+        dummy.position.set(-6, 12, 15);
+        dummy.lookAt({ x: 3, y: 3, z: 3 });
+
+        const tween = new TWEEN.Tween(dummy.position);
+        tween.to({
+          // x: 15,
+          // y: 12,
+          // z: 12,
+        }, 1000);
+        tween.onUpdate((e) => {
+          time += 1;
+          dummy.lookAt({ x: 3, y: 3, z: 3 });
+          dummy.position.x = (Math.cos(time / 100) * 15) + 3;
+          dummy.position.z = (Math.sin(time / 100) * 15) + 3;
+
+          // console.log(e * 2000);
+        });
+        tween.onComplete(() => {
+          // dummy.position.set(15, 12, 12);
+        });
+        tween.repeat(Infinity);
+        tween.start();
+
+
+        // camera.position.set(x, 12, z);
+        // const tween = new TWEEN.Tween(camera.position);
+        // tween.to({
+        //   x: x,
+        //   y: 12,
+        //   z: z,
+        // }, 1000);
+        // tween.easing(TWEEN.Easing.Quartic.Out);
+        // tween.onUpdate((e) => {
+        //   camera.lookAt({ x: 3, y: 3, z: 3 });
+        // });
+        // tween.onComplete(() => {
+        //   camera.position.set(x, 12, z);
+        // });
+        // tween.start();
+
+    //     break;
+    //   case 'p':
+    //     camera.position.set(x, 12, z);
+    //     break;
+    //   default:
+    //     break;
+    // }
+  // });
 }
 
 function addKeydownEventsFor(_obj) {
@@ -146,7 +224,7 @@ function initScene() {
 
 function initCamera() {
   camera = new THREE.PerspectiveCamera(45, 8 / 7, 1, 50);
-  camera.position.set(-6, 12, 16);
+  camera.position.set(-6, 12, 15);
   camera.lookAt({ x: 3, y: 3, z: 3 });
   scene.add(camera);
 }
@@ -166,7 +244,7 @@ function initLight() {
   scene.add(lights[2]);
 }
 
-function faces(faceCode) {
+function getFace(faceCode) {
   let color = 'rgb(0, 0, 0)';
   switch (faceCode) {
     case 'U':
@@ -228,40 +306,40 @@ function createCubes() {
         const myFaces = [];
         if (y === 5) {
           cubeName += 'U';
-          myFaces[2] = faces('U');
-          myFaces[5] = faces('N');
+          myFaces[2] = getFace('U');
+          myFaces[5] = getFace('N');
         }
         if (x === 1) {
           cubeName += 'L';
-          myFaces[1] = faces('L');
-          myFaces[0] = faces('N');
+          myFaces[1] = getFace('L');
+          myFaces[0] = getFace('N');
         }
         if (z === 5) {
           cubeName += 'F';
-          myFaces[4] = faces('F');
-          myFaces[3] = faces('N');
+          myFaces[4] = getFace('F');
+          myFaces[3] = getFace('N');
         }
         if (x === 5) {
           cubeName += 'R';
-          myFaces[0] = faces('R');
-          myFaces[1] = faces('N');
+          myFaces[0] = getFace('R');
+          myFaces[1] = getFace('N');
         }
         if (y === 1) {
           cubeName += 'D';
-          myFaces[3] = faces('D');
-          myFaces[2] = faces('N');
+          myFaces[3] = getFace('D');
+          myFaces[2] = getFace('N');
         }
         if (z === 1) {
           cubeName += 'B';
-          myFaces[5] = faces('B');
-          myFaces[4] = faces('N');
+          myFaces[5] = getFace('B');
+          myFaces[4] = getFace('N');
         }
 
         // Create MultiMaterial
         const materials = [];
         for (let i = 0; i < 6; i += 1) {
           const texture = (myFaces[i] === undefined) ?
-            new THREE.Texture(faces('N')) : new THREE.Texture(myFaces[i]);
+            new THREE.Texture(getFace('N')) : new THREE.Texture(myFaces[i]);
           texture.needsUpdate = true;
           // TODO: THREE.MultiMaterial has been removed. Use an Array instead.
           materials.push(new THREE.MeshBasicMaterial({
@@ -328,10 +406,6 @@ function initObject() {
 }
 
 function rotateFaceObj(direction, clockDirection) {
-  // if (isRotating) {
-  //   return;
-  // }
-
   const array = direction.concat();
   const cd = clockDirection ? 1 : -1;
   group = new THREE.Group();
@@ -624,12 +698,13 @@ function loop() {
   loopID = requestAnimationFrame(loop);
   TWEEN.update();
   renderer.render(scene, camera);
+  // renderer.render(scene, dummy.children[0]);
 
   (() => {
     if (autoRotate) {
-      theCube.rotation.x -= Math.PI * 0.01;
+      theCube.rotation.x -= Math.PI * 0.001;
       theCube.rotation.y -= Math.PI * 0.001;
-      theCube.rotation.z -= Math.PI * 0.01;
+      theCube.rotation.z -= Math.PI * 0.001;
     }
   })();
   stats.end();
@@ -643,14 +718,33 @@ function startThree() {
   initThree();
   initScene();
   initCamera();
-  initLight();
+  /* initLight(); */
   initObject();
   renderer.clear();
   loop();
 }
 
-// let autoRotate = true;
-let autoRotate = false;
 startThree();
-addKeydownEventsFor(allCubes[7]);
-// addKeydownEventsFor(mesh);
+// addKeydownEventsFor(allCubes[7]);
+// addKeydownEventsFor(theCube);
+cameraTest();
+
+
+function getRandomIntInclusive(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function randomCube(steps) {
+  const commandArray = ['U', 'F', 'R', 'D', 'L', 'B', "U'", "F'", "R'", "D'", "L'", "B'"];
+  let commandStr = '';
+  for (let i = 0; i < steps; i += 1) {
+    const indexRandom = getRandomIntInclusive(0, commandArray.length - 1);
+    commandStr += commandArray[indexRandom] + ' ';
+  }
+  return (commandStr);
+}
+
+commands(randomCube(10000));
+
