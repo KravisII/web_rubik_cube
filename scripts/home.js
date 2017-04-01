@@ -1,8 +1,9 @@
 /* eslint-env browser */
-/* eslint no-console: off, strict: off */
+/* eslint no-console: off, strict: off, no-underscore-dangle: off*/
 /* global THREE, TWEEN, Stats*/
 // 使用数组记录旋转面
 // TODO: 添加面小块标记
+// TODO: 加入动画序列
 // TODO: 检测是否还原
 // TODO: 添加照相机移动轨迹，90度旋转
 // TODO: 对 requestAnimationFrame 的改进（魔方崩坏）
@@ -16,7 +17,6 @@ const faceRatio = 0.5;
 let canvasElement;
 let renderer;
 let scene;
-let dummy;
 let camera;
 let mesh;
 let theCube;
@@ -38,7 +38,7 @@ let isRotating = false;
 // let autoRotate = true;
 let autoRotate = false;
 
-let duration = 200;
+let duration = 300;
 
 // const colors = [0xff3b30, 0xff9500, 0xffcc00, 0x4cd964, 0x5ac8fa, 0x007AFF, 0x5856D6, 0xFF2C55];
 
@@ -53,6 +53,22 @@ function getCSSValue(element, property) {
 
   const valueStr = window.getComputedStyle(element, null)[property];
   return (parseInt(valueStr, 10));
+}
+
+function getRandomIntInclusive(min, max) {
+  const _min = Math.ceil(min);
+  const _max = Math.floor(max);
+  return Math.floor(Math.random() * (_max - _min + 1)) + _min;
+}
+
+function randomCube(steps) {
+  const commandFlags = ['U', 'F', 'R', 'D', 'L', 'B', "U'", "F'", "R'", "D'", "L'", "B'"];
+  const commandArray = [];
+  for (let i = 0; i < steps; i += 1) {
+    const indexRandom = getRandomIntInclusive(0, commandFlags.length - 1);
+    commandArray.push(commandFlags[indexRandom]);
+  }
+  return (commandArray.join(' '));
 }
 
 function cameraTest() {
@@ -89,8 +105,18 @@ function cameraTest() {
         tween.onUpdate(() => {
           time += 1;
           dummy.lookAt({ x: 3, y: 3, z: 3 });
-          dummy.position.x = (Math.cos(time / 100) * 15) + 3;
-          dummy.position.z = (Math.sin(time / 100) * 15) + 3;
+
+          // dummy.up.set(10, 0, 0);
+          // dummy.position.z = (Math.cos(time / 100) * 15) + 3;
+          // dummy.position.y = (Math.sin(time / 100) * 15) + 3;
+
+          dummy.up.set(0, 1, 0);
+          dummy.position.z = (Math.cos(time / 100) * 15) + 3;
+          dummy.position.x = (Math.sin(time / 100) * 15) + 3;
+
+          // dummy.up.set(0, 0, 1);
+          // dummy.position.y = (Math.cos(time / 100) * 15) + 3;
+          // dummy.position.x = (Math.sin(time / 100) * 15) + 3;
 
           // console.log(e * 2000);
         });
@@ -408,13 +434,14 @@ function initObject() {
 }
 
 function rotateFaceObj(direction, clockDirection) {
-  const array = direction.concat();
+  // TODO: http://stackoverflow.com/questions/20089098/three-js-adding-and-removing-children-of-rotated-objects
+  const activeArray = direction.concat();
   const cd = clockDirection ? 1 : -1;
   group = new THREE.Group();
-  for (let i = 0; i < array.length; i += 1) {
-    group.add(array[i]);
+  for (let i = 0; i < activeArray.length; i += 1) {
+    THREE.SceneUtils.attach(activeArray[i], scene, group);
   }
-
+  group.updateMatrixWorld();
   switch (direction) {
     case leftArray:
       group = changePivot(0, 3, 3, group);
@@ -437,8 +464,8 @@ function rotateFaceObj(direction, clockDirection) {
     default:
       break;
   }
-
   scene.add(group);
+
 
   const tween = new TWEEN.Tween(group.rotation);
   switch (direction) {
@@ -476,32 +503,25 @@ function rotateFaceObj(direction, clockDirection) {
       break;
   }
   tween.easing(TWEEN.Easing.Quartic.Out);
-
   tween.onStart(() => {
     isRotating = true;
-    console.log('start');
   });
-
-  tween.onUpdate(() => {});
 
   tween.onComplete(() => {
     isRotating = false;
     for (let i = 0; i < 9; i += 1) {
-      const cube = array.pop();
-      cube.position.set(
-        Math.round(cube.getWorldPosition().x),
-        Math.round(cube.getWorldPosition().y),
-        Math.round(cube.getWorldPosition().z));
-      cube.setRotationFromMatrix(cube.matrixWorld);
-
-      // cube.setRotationFromEuler(cube.getWorldRotation());
-      mesh.add(cube);
+      const cube = activeArray.pop();
+      THREE.SceneUtils.detach(cube, group.children[0], scene);
     }
     scene.remove(group);
     doQueue();
   });
+
   tween.start();
+  console.log(stepCount++);
 }
+
+let stepCount = 1;
 
 // 使用数组记录不同面
 function rotateFace(directionArray, clockDirection) {
@@ -665,6 +685,7 @@ function doQueue() {
 
 function commands(str) {
   // 解析多个命令，形如「R L U2」。
+  console.log(str);
   const tempQueue = str.split(' ');
   console.log(tempQueue);
   for (let i = 0; i < tempQueue.length; i += 1) {
@@ -679,20 +700,9 @@ function commands(str) {
 
 function loop() {
   stats.begin();
-
   loopID = requestAnimationFrame(loop);
   TWEEN.update();
   renderer.render(scene, camera);
-  // renderer.render(scene, dummy.children[0]);
-
-  // (() => {
-  //   if (autoRotate) {
-  //     theCube.rotation.x -= Math.PI * 0.001;
-  //     theCube.rotation.y -= Math.PI * 0.001;
-  //     theCube.rotation.z -= Math.PI * 0.001;
-  //   }
-  // })();
-
   stats.end();
 }
 
@@ -715,22 +725,8 @@ startThree();
 // addKeydownEventsFor(theCube);
 cameraTest();
 
-
-function getRandomIntInclusive(min, max) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-function randomCube(steps) {
-  const commandFlags = ['U', 'F', 'R', 'D', 'L', 'B', "U'", "F'", "R'", "D'", "L'", "B'"];
-  const commandArray = [];
-  for (let i = 0; i < steps; i += 1) {
-    const indexRandom = getRandomIntInclusive(0, commandFlags.length - 1);
-    commandArray.push(commandFlags[indexRandom]);
-  }
-  return (commandArray.join(' '));
-}
-
-commands(randomCube(1000));
-
+// commands(randomCube(1000));
+commands("L' L' D' U' R F D L' L' F' F U F' B' D' F' F' U' D' F D' L' F' F U' U U F' R U F' B F' D' F D U' R B F U' B' B R' U' B B' B' B U'");
+setTimeout(() => {
+  commands("L B U B' R' L' U' L B' U L L B' R' D' R R D' F' U");
+}, 2000);
