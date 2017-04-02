@@ -3,12 +3,12 @@
 /* global THREE, TWEEN, Stats*/
 // 使用数组记录旋转面
 // TODO: 添加面小块标记
-// TODO: 加入动画序列
 // TODO: 检测是否还原
 // TODO: 添加照相机移动轨迹，90度旋转
 // TODO: 对 requestAnimationFrame 的改进（魔方崩坏）
 // TODO: MVC 分离
 
+// TODO: 加入动画序列
 'use strict';
 
 /* Global Values */
@@ -74,83 +74,39 @@ function randomCube(steps) {
 function cameraTest() {
   let time = 0;
   // document.addEventListener('keydown', (event) => {
-    // 轨迹方程（设 y = 3 为中心轴）
-    // var origin = camera.position.clone();
-    // var alpha = Math.atan((origin.z - 3) / (origin.x - 3));
-    // var x = (Math.cos(alpha + (Math.PI / 2)) * 15) + 3;
-    // var z = (Math.sin(alpha + (Math.PI / 2)) * 15) + 3;
+  // 轨迹方程（设 y = 3 为中心轴）
+  // var origin = camera.position.clone();
+  // var alpha = Math.atan((origin.z - 3) / (origin.x - 3));
+  // var x = (Math.cos(alpha + (Math.PI / 2)) * 15) + 3;
+  // var z = (Math.sin(alpha + (Math.PI / 2)) * 15) + 3;
 
+  const dummy = new THREE.Group();
 
-    // const keyName = event.key || event.keyIdentifier;
-    // switch (keyName) {
-    //   case 'o':
-        // let alpha = Math.atan((origin.z - 3) / (origin.x - 3));
-        let dummy = new THREE.Group;
+  dummy.add(camera);
+  scene.add(dummy);
 
-        dummy.add(camera);
-        scene.add(dummy);
+  camera.position.set(0, 0, 0);
+  camera.rotation.set(-Math.PI, 0, -Math.PI);
 
-        camera.position.set(0, 0, 0);
-        camera.rotation.set(-Math.PI, 0, -Math.PI);
+  dummy.position.set(-6, 12, 15);
+  dummy.lookAt({ x: 3, y: 3, z: 3 });
 
-        dummy.position.set(-6, 12, 15);
-        dummy.lookAt({ x: 3, y: 3, z: 3 });
-
-        const tween = new TWEEN.Tween(dummy.position);
-        tween.to({
-          // x: 15,
-          // y: 12,
-          // z: 12,
-        }, 1000);
-        tween.onUpdate(() => {
-          time += 1;
-          dummy.lookAt({ x: 3, y: 3, z: 3 });
-
-          // dummy.up.set(10, 0, 0);
-          // dummy.position.z = (Math.cos(time / 100) * 15) + 3;
-          // dummy.position.y = (Math.sin(time / 100) * 15) + 3;
-
-          dummy.up.set(0, 1, 0);
-          dummy.position.z = (Math.cos(time / 100) * 15) + 3;
-          dummy.position.x = (Math.sin(time / 100) * 15) + 3;
-
-          // dummy.up.set(0, 0, 1);
-          // dummy.position.y = (Math.cos(time / 100) * 15) + 3;
-          // dummy.position.x = (Math.sin(time / 100) * 15) + 3;
-
-          // console.log(e * 2000);
-        });
-        tween.onComplete(() => {
-          // dummy.position.set(15, 12, 12);
-        });
-        tween.repeat(Infinity);
-        tween.start();
-
-
-        // camera.position.set(x, 12, z);
-        // const tween = new TWEEN.Tween(camera.position);
-        // tween.to({
-        //   x: x,
-        //   y: 12,
-        //   z: z,
-        // }, 1000);
-        // tween.easing(TWEEN.Easing.Quartic.Out);
-        // tween.onUpdate((e) => {
-        //   camera.lookAt({ x: 3, y: 3, z: 3 });
-        // });
-        // tween.onComplete(() => {
-        //   camera.position.set(x, 12, z);
-        // });
-        // tween.start();
-
-    //     break;
-    //   case 'p':
-    //     camera.position.set(x, 12, z);
-    //     break;
-    //   default:
-    //     break;
-    // }
-  // });
+  const tween = new TWEEN.Tween(dummy.position);
+  tween.to({
+    // x: 15,
+    // y: 12,
+    // z: 12,
+  }, 1000);
+  tween.onUpdate(() => {
+    time += 1;
+    dummy.lookAt({ x: 3, y: 3, z: 3 });
+    dummy.up.set(0, 1, 0);
+    dummy.position.z = (Math.cos(time / 100) * 15) + 3;
+    dummy.position.x = (Math.sin(time / 100) * 15) + 3;
+  });
+  tween.onComplete(() => {});
+  tween.repeat(Infinity);
+  tween.start();
 }
 
 function addKeydownEventsFor(_obj) {
@@ -207,7 +163,7 @@ function addKeydownEventsFor(_obj) {
 function markUpCube(_obj) {
   const objInner = _obj;
   for (let i = 0; i < objInner.material.materials.length; i += 1) {
-    objInner.material.materials[i].opacity = 0.2;
+    objInner.material.materials[i].opacity = 0.6;
     objInner.material.materials[i].transparent = true;
   }
 }
@@ -241,7 +197,7 @@ function initThree() {
     antialiasing: true,
     canvas: canvasElement,
   });
-  renderer.setSize(800, 700);
+  renderer.setSize(500, 500);
   renderer.setClearColor(0xffffff);
   renderer.setPixelRatio(window.devicePixelRatio);
 }
@@ -251,7 +207,7 @@ function initScene() {
 }
 
 function initCamera() {
-  camera = new THREE.PerspectiveCamera(45, 8 / 7, 1, 50);
+  camera = new THREE.PerspectiveCamera(45, 5 / 5, 1, 50);
   camera.position.set(-6, 12, 15);
   camera.lookAt({ x: 3, y: 3, z: 3 });
   scene.add(camera);
@@ -294,8 +250,14 @@ function getFace(faceCode) {
       color = 'rgb(0, 122, 255)';
       break;
     case 'N':
-      color = 'rgba(0, 0, 0, 0)';
-      break;
+      // TODO: 优化
+      const canvas = document.createElement('canvas');
+      canvas.width = 16 * faceRatio;
+      canvas.height = 16 * faceRatio;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = 'black';
+      ctx.fillRect(0, 0, 16, 16);
+      return canvas;
     default:
       break;
   }
@@ -319,7 +281,7 @@ function getFace(faceCode) {
   ctx.stroke();
   ctx.fill();
   // Add Text Label
-  ctx.fillStyle = 'black';
+  ctx.fillStyle = 'rgba(0,0,0,0.9)';
   ctx.font = `Italic ${200 * faceRatio}px Times New Roman`;
   ctx.fillText(faceCode, 160 * faceRatio, 364 * faceRatio);
   return canvas;
@@ -373,6 +335,7 @@ function createCubes() {
           materials.push(new THREE.MeshBasicMaterial({
             map: texture,
             name: i,
+            side: THREE.DoubleSide,
           }));
         }
         const cubemat = new THREE.MultiMaterial(materials);
@@ -505,13 +468,13 @@ function rotateFaceObj(direction, clockDirection) {
   tween.easing(TWEEN.Easing.Quartic.Out);
   tween.onStart(() => {
     isRotating = true;
+    console.log(tween);
   });
 
   tween.onComplete(() => {
     isRotating = false;
-    for (let i = 0; i < 9; i += 1) {
-      const cube = activeArray.pop();
-      THREE.SceneUtils.detach(cube, group.children[0], scene);
+    for (let i = 0; i < activeArray.length; i += 1) {
+      THREE.SceneUtils.detach(activeArray[i], group.children[0], scene);
     }
     scene.remove(group);
     doQueue();
@@ -633,6 +596,7 @@ function getCubesName(array) {
 }
 
 function command(str) {
+  // TODO: 接受单个指令，形如 "F", "f", "F'"
   let facelet = '';
   let clockDirection = true;
 
@@ -683,19 +647,106 @@ function doQueue() {
   }
 }
 
+function isReverseToken(a, b) {
+  if (/[a-z]/.test(a)) {
+    return a.toUpperCase() === b;
+  } else if (/[A-Z]/.test(a)) {
+    return a.toLowerCase() === b;
+  }
+  return false;
+}
+
+function getReverseToken(a) {
+  if (/[a-z]/.test(a)) {
+    return a.toUpperCase();
+  } else if (/[A-Z]/.test(a)) {
+    return a.toLowerCase();
+  }
+  return '';
+}
+
 function commands(str) {
-  // 解析多个命令，形如「R L U2」。
-  console.log(str);
-  const tempQueue = str.split(' ');
-  console.log(tempQueue);
-  for (let i = 0; i < tempQueue.length; i += 1) {
-    if (tempQueue[i].length === 2 && tempQueue[i][1] === '2') {
-      tempQueue.splice(i, 1, tempQueue[i][0], tempQueue[i][0]);
+  // 1. 预处理字符串
+  // 1.1 参数检测
+  if (typeof str !== 'string' || str === '') {
+    throw new TypeError('函数 commands 的参数必须是非空字符串');
+  }
+  // 1.2 去掉多余空格
+  let tempStr = ` ${str} `;
+  tempStr = tempStr.replace(/\s+/g, '#');
+  tempStr = tempStr.slice(1, tempStr.length - 1);
+
+  // 2. 分割字符串成数组
+  // 2.1 把两步化成单步 ['F2'] -> ['F', 'F']
+  // 2.2 把逆时针转动化为小写 ["F'"] -> ["f"]
+  let tempList = tempStr.split('#');
+  let resultList = [];
+  for (let i = 0; i < tempList.length; i += 1) {
+    const currentCommand = tempList[i];
+    switch (currentCommand.length) {
+      case 2:
+        const reverse = currentCommand.match(/[UFRDLB]'/);
+        const double = currentCommand.match(/[UFRDLB]2/);
+        if (reverse) {
+          resultList.push(currentCommand[0].toLowerCase());
+        }
+        if (double) {
+          tempList.splice(i, 1, currentCommand[0], currentCommand[0]);
+          i -= 1;
+        }
+        break;
+      case 1:
+        if (currentCommand.match(/[UFRDLB]/)) {
+          resultList.push(currentCommand);
+          break;
+        }
+      default:
+        throw new TypeError(`${currentCommand} 不是合法的参数`);
     }
   }
+  console.log('2.2', resultList);
 
-  queue = queue.concat(tempQueue);
-  doQueue();
+  // 2.3 合并命令 ["F", "F", "F"] -> ["F'"]
+  for (let i = 0; i < resultList.length - 2; i += 1) {
+    const cm = resultList[i];
+    const nm = resultList[i + 1];
+    const nnm = resultList[i + 2];
+    if (cm === nm && nm === nnm) {
+      resultList.splice(i, 3, getReverseToken(cm));
+      i -= 2;
+    }
+  }
+  console.log('2.3', resultList);
+
+  // 2.4 去除重复无效命令 ["F", "F'", "U"] -> ["U"]
+  for (let i = 0; i < resultList.length - 1; i += 1) {
+    const currentCommand = resultList[i];
+    const nextCommand = resultList[i + 1];
+    if (isReverseToken(currentCommand, nextCommand)) {
+      resultList.splice(i, 2);
+      i -= 1;
+    }
+  }
+  console.log('2.4', resultList);
+
+  // 3 依次执行 command 函数
+  for (let token of resultList) {
+    command(token);
+  }
+
+  /* OLD CODE
+    console.log(str);
+    const tempQueue = str.split(' ');
+    console.log(tempQueue);
+    for (let i = 0; i < tempQueue.length; i += 1) {
+      if (tempQueue[i].length === 2 && tempQueue[i][1] === '2') {
+        tempQueue.splice(i, 1, tempQueue[i][0], tempQueue[i][0]);
+      }
+    }
+
+    queue = queue.concat(tempQueue);
+    doQueue();
+  */
 }
 
 function loop() {
@@ -721,12 +772,17 @@ function startThree() {
 }
 
 startThree();
-// addKeydownEventsFor(allCubes[7]);
+addKeydownEventsFor(allCubes[7]);
 // addKeydownEventsFor(theCube);
 cameraTest();
 
+for (let i = 0; i < allCubes.length; i += 1) {
+  markUpCube(allCubes[i]);
+}
+
 // commands(randomCube(1000));
-commands("L' L' D' U' R F D L' L' F' F U F' B' D' F' F' U' D' F D' L' F' F U' U U F' R U F' B F' D' F D U' R B F U' B' B R' U' B B' B' B U'");
-setTimeout(() => {
-  commands("L B U B' R' L' U' L B' U L L B' R' D' R R D' F' U");
-}, 2000);
+
+// commands("L' L' D' U' R F D L' L' F' F U F' B' D' F' F' U' D' F D' L' F' F U' U U F' R U F' B F' D' F D U' R B F U' B' B R' U' B B' B' B U'");
+// setTimeout(() => {
+//   commands("L B U B' R' L' U' L B' U L L B' R' D' R R D' F' U");
+// }, 2000);
