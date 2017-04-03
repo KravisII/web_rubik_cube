@@ -5,10 +5,10 @@
 // TODO: 添加面小块标记
 // TODO: 检测是否还原
 // TODO: 添加照相机移动轨迹，90度旋转
-// TODO: 对 requestAnimationFrame 的改进（魔方崩坏）
 // TODO: MVC 分离
 
-// TODO: 加入动画序列
+// GIVEUP: 对 requestAnimationFrame 的改进（魔方崩坏）
+
 'use strict';
 
 /* Global Values */
@@ -20,7 +20,6 @@ let scene;
 let camera;
 let mesh;
 let theCube;
-let group;
 
 let upArray = [];
 let frontArray = [];
@@ -29,16 +28,15 @@ let downArray = [];
 let leftArray = [];
 let backArray = [];
 
-let queue = [];
+const rotationTaskList = [];
 
 const allCubes = [];
 let loopID;
 
 let isRotating = false;
-// let autoRotate = true;
 let autoRotate = false;
 
-let duration = 300;
+let duration = 500;
 
 // const colors = [0xff3b30, 0xff9500, 0xffcc00, 0x4cd964, 0x5ac8fa, 0x007AFF, 0x5856D6, 0xFF2C55];
 
@@ -396,32 +394,64 @@ function initObject() {
   scene.add(theCube);
 }
 
-function rotateFaceObj(direction, clockDirection) {
-  // TODO: http://stackoverflow.com/questions/20089098/three-js-adding-and-removing-children-of-rotated-objects
-  const activeArray = direction.concat();
-  const cd = clockDirection ? 1 : -1;
+function getCubesName(array) {
+  for (let i = 0; i < array.length; i += 1) {
+    console.log(i, array[i].name);
+  }
+}
+
+function executeRotation() {
+  isRotating = true;
+  const cmd = rotationTaskList.pop();
+  const [facelet, direction] = [cmd.facelet, cmd.direction];
+  let group;
+  let activeArray;
+  // 1. 准备动画 group
   group = new THREE.Group();
-  for (let i = 0; i < activeArray.length; i += 1) {
-    THREE.SceneUtils.attach(activeArray[i], scene, group);
+  let groupArray;
+  switch (facelet) {
+    case 'U':
+      groupArray = upArray;
+      break;
+    case 'F':
+      groupArray = frontArray;
+      break;
+    case 'R':
+      groupArray = rightArray;
+      break;
+    case 'D':
+      groupArray = downArray;
+      break;
+    case 'L':
+      groupArray = leftArray;
+      break;
+    case 'B':
+      groupArray = backArray;
+      break;
+    default:
+      throw new TypeError(`${facelet} 不是合法的面标记`);
+  }
+  for (let i = 0; i < groupArray.length; i += 1) {
+    THREE.SceneUtils.attach(groupArray[i], scene, group);
   }
   group.updateMatrixWorld();
-  switch (direction) {
-    case leftArray:
-      group = changePivot(0, 3, 3, group);
-      break;
-    case rightArray:
-      group = changePivot(5, 3, 3, group);
-      break;
-    case upArray:
+  switch (facelet) {
+    case 'U':
       group = changePivot(3, 5, 3, group);
       break;
-    case downArray:
-      group = changePivot(3, 1, 3, group);
-      break;
-    case frontArray:
+    case 'F':
       group = changePivot(3, 3, 5, group);
       break;
-    case backArray:
+    case 'R':
+      group = changePivot(5, 3, 3, group);
+      break;
+    case 'D':
+      group = changePivot(3, 1, 3, group);
+      break;
+    case 'L':
+      group = changePivot(0, 3, 3, group);
+      break;
+    case 'B':
       group = changePivot(3, 3, 1, group);
       break;
     default:
@@ -429,222 +459,176 @@ function rotateFaceObj(direction, clockDirection) {
   }
   scene.add(group);
 
+  if (direction !== -1 && direction !== 1) {
+    throw new TypeError(`${direction} 不是合法的时钟方向命令`);
+  }
+  const rotationTask = new TWEEN.Tween(group.rotation);
+  rotationTask.name = `${facelet}, ${direction}`;
+  rotationTask.easing(TWEEN.Easing.Quartic.Out);
+  rotationTask.onStart(() => {
+    // 2. 修改相邻面的数组
+    const neighbors = [];
+    let currentArray = [];
+    switch (facelet) {
+      case 'U':
+        currentArray = upArray;
+        neighbors.push(backArray);
+        neighbors.push(rightArray);
+        neighbors.push(frontArray);
+        neighbors.push(leftArray);
+        break;
+      case 'F':
+        currentArray = frontArray;
+        neighbors.push(upArray);
+        neighbors.push(rightArray);
+        neighbors.push(downArray);
+        neighbors.push(leftArray);
+        break;
+      case 'R':
+        currentArray = rightArray;
+        neighbors.push(upArray);
+        neighbors.push(backArray);
+        neighbors.push(downArray);
+        neighbors.push(frontArray);
+        break;
+      case 'D':
+        currentArray = downArray;
+        neighbors.push(frontArray);
+        neighbors.push(rightArray);
+        neighbors.push(backArray);
+        neighbors.push(leftArray);
+        break;
+      case 'L':
+        currentArray = leftArray;
+        neighbors.push(upArray);
+        neighbors.push(frontArray);
+        neighbors.push(downArray);
+        neighbors.push(backArray);
+        break;
+      case 'B':
+        currentArray = backArray;
+        neighbors.push(upArray);
+        neighbors.push(leftArray);
+        neighbors.push(downArray);
+        neighbors.push(rightArray);
+        break;
+      default:
+        throw new TypeError(`${facelet} 不是合法的面标记`);
+    }
+    if (direction === 1) {
+      // true: 顺时针
+      activeArray = [currentArray[2], currentArray[5], currentArray[8],
+        currentArray[1], currentArray[4], currentArray[7],
+        currentArray[0], currentArray[3], currentArray[6],
+      ];
+    } else {
+      // false: 逆时针
+      activeArray = [currentArray[6], currentArray[3], currentArray[0],
+        currentArray[7], currentArray[4], currentArray[1],
+        currentArray[8], currentArray[5], currentArray[2],
+      ];
+    }
+    for (let i = 0; i < 4; i += 1) {
+      const neighbor = neighbors[i].concat();
+      for (let j = 0; j < 9; j += 1) {
+        const index = neighbor.indexOf(currentArray[j]);
+        if (index >= 0) {
+          neighbors[i][index] = activeArray[j];
+        }
+      }
+    }
 
-  const tween = new TWEEN.Tween(group.rotation);
-  switch (direction) {
-    case leftArray:
-      tween.to({
-        x: +(cd * (Math.PI * 0.5)),
-      }, duration);
+    switch (facelet) {
+      case 'U':
+        upArray = activeArray.concat();
+        break;
+      case 'F':
+        frontArray = activeArray.concat();
+        break;
+      case 'R':
+        rightArray = activeArray.concat();
+        break;
+      case 'D':
+        downArray = activeArray.concat();
+        break;
+      case 'L':
+        leftArray = activeArray.concat();
+        break;
+      case 'B':
+        backArray = activeArray.concat();
+        break;
+      default:
+        break;
+    }
+  });
+
+  switch (facelet) {
+    case 'U':
+      rotationTask.to({ y: -(direction * (Math.PI * 0.5)) }, duration);
       break;
-    case rightArray:
-      tween.to({
-        x: -(cd * (Math.PI * 0.5)),
-      }, duration);
+    case 'F':
+      rotationTask.to({ z: -(direction * (Math.PI * 0.5)) }, duration);
       break;
-    case upArray:
-      tween.to({
-        y: -(cd * (Math.PI * 0.5)),
-      }, duration);
+    case 'R':
+      rotationTask.to({ x: -(direction * (Math.PI * 0.5)) }, duration);
       break;
-    case downArray:
-      tween.to({
-        y: +(cd * (Math.PI * 0.5)),
-      }, duration);
+    case 'D':
+      rotationTask.to({ y: +(direction * (Math.PI * 0.5)) }, duration);
       break;
-    case frontArray:
-      tween.to({
-        z: -(cd * (Math.PI * 0.5)),
-      }, duration);
+    case 'L':
+      rotationTask.to({ x: +(direction * (Math.PI * 0.5)) }, duration);
       break;
-    case backArray:
-      tween.to({
-        z: +(cd * (Math.PI * 0.5)),
-      }, duration);
+    case 'B':
+      rotationTask.to({ z: +(direction * (Math.PI * 0.5)) }, duration);
       break;
     default:
       break;
   }
-  tween.easing(TWEEN.Easing.Quartic.Out);
-  tween.onStart(() => {
-    isRotating = true;
-    console.log(tween);
-  });
 
-  tween.onComplete(() => {
-    isRotating = false;
+  rotationTask.onComplete(() => {
     for (let i = 0; i < activeArray.length; i += 1) {
       THREE.SceneUtils.detach(activeArray[i], group.children[0], scene);
     }
     scene.remove(group);
-    doQueue();
+    isRotating = false;
+    console.log(stepCount++);
   });
-
-  tween.start();
-  console.log(stepCount++);
+  rotationTask.start();
 }
 
 let stepCount = 1;
 
-// 使用数组记录不同面
-function rotateFace(directionArray, clockDirection) {
-  // clockDirection:
-  // false: 逆时针
-  // true: 顺时针
-  let neighbors = [];
-  // 0: top, 1: right, 2: down, 3: left
-  switch (directionArray) {
-    case leftArray:
-      neighbors.push(upArray);
-      neighbors.push(frontArray);
-      neighbors.push(downArray);
-      neighbors.push(backArray);
-      break;
-    case upArray:
-      neighbors.push(backArray);
-      neighbors.push(rightArray);
-      neighbors.push(frontArray);
-      neighbors.push(leftArray);
-      break;
-    case frontArray:
-      neighbors.push(upArray);
-      neighbors.push(rightArray);
-      neighbors.push(downArray);
-      neighbors.push(leftArray);
-      break;
-    case rightArray:
-      neighbors.push(upArray);
-      neighbors.push(backArray);
-      neighbors.push(downArray);
-      neighbors.push(frontArray);
-      break;
-    case downArray:
-      neighbors.push(frontArray);
-      neighbors.push(rightArray);
-      neighbors.push(backArray);
-      neighbors.push(leftArray);
-      break;
-    case backArray:
-      neighbors.push(upArray);
-      neighbors.push(leftArray);
-      neighbors.push(downArray);
-      neighbors.push(rightArray);
-      break;
-    default:
-      throw new TypeError(`${directionArray} is not a direction array.`);
-  }
-
-  let tempArray;
-  if (clockDirection) {
-    // true: 顺时针
-    tempArray = [directionArray[2], directionArray[5], directionArray[8],
-      directionArray[1], directionArray[4], directionArray[7],
-      directionArray[0], directionArray[3], directionArray[6]
-    ];
-  } else {
-    // false: 逆时针
-    tempArray = [directionArray[6], directionArray[3], directionArray[0],
-      directionArray[7], directionArray[4], directionArray[1],
-      directionArray[8], directionArray[5], directionArray[2]
-    ];
-  }
-
-  for (let i = 0; i < 4; i += 1) {
-    const neighbor = neighbors[i].concat();
-    for (let j = 0; j < 9; j += 1) {
-      const index = neighbor.indexOf(directionArray[j]);
-      if (index >= 0) {
-        neighbors[i][index] = tempArray[j];
-      }
-    }
-  }
-
-  switch (directionArray) {
-    case leftArray:
-      leftArray = tempArray.concat();
-      rotateFaceObj(leftArray, clockDirection);
-      break;
-    case rightArray:
-      rightArray = tempArray.concat();
-      rotateFaceObj(rightArray, clockDirection);
-      break;
-    case upArray:
-      upArray = tempArray.concat();
-      rotateFaceObj(upArray, clockDirection);
-      break;
-    case downArray:
-      downArray = tempArray.concat();
-      rotateFaceObj(downArray, clockDirection);
-      break;
-    case frontArray:
-      frontArray = tempArray.concat();
-      rotateFaceObj(frontArray, clockDirection);
-      break;
-    case backArray:
-      backArray = tempArray.concat();
-      rotateFaceObj(backArray, clockDirection);
-      break;
-    default:
-      break;
-  }
-}
-
-function getCubesName(array) {
-  for (let i = 0; i < array.length; i += 1) {
-    console.log(i, array[i].name);
-  }
-}
-
-function command(str) {
-  // TODO: 接受单个指令，形如 "F", "f", "F'"
+function command(token) {
+  // 解析单个命令，形如 "R", "r", "R'"
+  // 分别表示「右侧顺时针转动」、「右侧逆时针转动」、「右侧逆时针转动」
   let facelet = '';
-  let clockDirection = true;
+  let clockDirection = 0;
 
-  // 解析单个命令，形如「R」、「R'」，分别表示
-  // 右侧顺时针转动 和 右侧逆时针转动
-  if (str.length === 2) {
-    facelet = str[0];
-    clockDirection = str[1] === "'" ? !clockDirection : true;
+  if (token.length === 2) {
+    if (token[1] !== "'") {
+      throw new TypeError(`${token} 不是合法的命令`);
+    } else {
+      facelet = token[0].toUpperCase();
+      clockDirection = -1;
+    }
+  } else if (token.length === 1) {
+    if (/[a-z]/.test(token)) {
+      facelet = token.toUpperCase();
+      clockDirection = -1;
+    } else if (/[A-Z]/.test(token)) {
+      facelet = token;
+      clockDirection = 1;
+    } else {
+      throw new TypeError(`${token} 不是合法的命令`);
+    }
   } else {
-    facelet = str[0];
+    throw new TypeError(`${token} 不是合法的命令`);
   }
-  let currentArray;
-  switch (facelet) {
-    case 'U':
-      currentArray = upArray;
-      break;
-    case 'F':
-      currentArray = frontArray;
-      break;
-    case 'R':
-      currentArray = rightArray;
-      break;
-    case 'D':
-      currentArray = downArray;
-      break;
-    case 'L':
-      currentArray = leftArray;
-      break;
-    case 'B':
-      currentArray = backArray;
-      break;
-    default:
-      currentArray = [];
-      throw (new TypeError('输入的命令不合法。'));
-  }
-  rotateFace(currentArray, clockDirection);
-}
 
-function doQueue() {
-  if (isRotating) {
-    return;
-  }
-  const singleCommand = queue.shift();
-  if (singleCommand !== undefined) {
-    command(singleCommand);
-  } else {
-    console.log('Command queue is empty now.');
-  }
+  rotationTaskList.push({
+    'facelet': facelet,
+    'direction': clockDirection,
+  });
 }
 
 function isReverseToken(a, b) {
@@ -679,32 +663,31 @@ function commands(str) {
   // 2. 分割字符串成数组
   // 2.1 把两步化成单步 ['F2'] -> ['F', 'F']
   // 2.2 把逆时针转动化为小写 ["F'"] -> ["f"]
-  let tempList = tempStr.split('#');
-  let resultList = [];
+  const tempList = tempStr.split('#');
+  const resultList = [];
   for (let i = 0; i < tempList.length; i += 1) {
     const currentCommand = tempList[i];
-    switch (currentCommand.length) {
-      case 2:
-        const reverse = currentCommand.match(/[UFRDLB]'/);
-        const double = currentCommand.match(/[UFRDLB]2/);
-        if (reverse) {
-          resultList.push(currentCommand[0].toLowerCase());
-        }
-        if (double) {
-          tempList.splice(i, 1, currentCommand[0], currentCommand[0]);
-          i -= 1;
-        }
-        break;
-      case 1:
-        if (currentCommand.match(/[UFRDLB]/)) {
-          resultList.push(currentCommand);
-          break;
-        }
-      default:
+    if (currentCommand.length === 2) {
+      const reverse = currentCommand.match(/[UFRDLB]'/);
+      const double = currentCommand.match(/[UFRDLB]2/);
+      if (reverse) {
+        resultList.push(currentCommand[0].toLowerCase());
+      }
+      if (double) {
+        tempList.splice(i, 1, currentCommand[0], currentCommand[0]);
+        i -= 1;
+      }
+    } else if (currentCommand.length === 1) {
+      if (currentCommand.match(/[UFRDLB]/)) {
+        resultList.push(currentCommand);
+      } else {
         throw new TypeError(`${currentCommand} 不是合法的参数`);
+      }
+    } else {
+      throw new TypeError(`${currentCommand} 不是合法的参数`);
     }
   }
-  console.log('2.2', resultList);
+  // console.log('2.2', resultList);
 
   // 2.3 合并命令 ["F", "F", "F"] -> ["F'"]
   for (let i = 0; i < resultList.length - 2; i += 1) {
@@ -716,7 +699,7 @@ function commands(str) {
       i -= 2;
     }
   }
-  console.log('2.3', resultList);
+  // console.log('2.3', resultList);
 
   // 2.4 去除重复无效命令 ["F", "F'", "U"] -> ["U"]
   for (let i = 0; i < resultList.length - 1; i += 1) {
@@ -727,31 +710,31 @@ function commands(str) {
       i -= 1;
     }
   }
-  console.log('2.4', resultList);
+  // console.log('2.4', resultList);
+  console.log('Real token count', resultList.length);
+  return resultList;
+}
 
-  // 3 依次执行 command 函数
-  for (let token of resultList) {
+function reverseCommands(str) {
+  const resultList = commands(str);
+  for (let i = resultList.length - 1; i >= 0; i -= 1) {
+    command(getReverseToken(resultList[i]));
+  }
+}
+
+function executeCommands(str) {
+  const resultList = commands(str);
+  for (const token of resultList) {
     command(token);
   }
-
-  /* OLD CODE
-    console.log(str);
-    const tempQueue = str.split(' ');
-    console.log(tempQueue);
-    for (let i = 0; i < tempQueue.length; i += 1) {
-      if (tempQueue[i].length === 2 && tempQueue[i][1] === '2') {
-        tempQueue.splice(i, 1, tempQueue[i][0], tempQueue[i][0]);
-      }
-    }
-
-    queue = queue.concat(tempQueue);
-    doQueue();
-  */
 }
 
 function loop() {
   stats.begin();
   loopID = requestAnimationFrame(loop);
+  if (rotationTaskList.length !== 0 && !isRotating) {
+    executeRotation();
+  }
   TWEEN.update();
   renderer.render(scene, camera);
   stats.end();
@@ -769,15 +752,17 @@ function startThree() {
   initObject();
   renderer.clear();
   loop();
+  // setInterval(loop, 10);
 }
 
 startThree();
 addKeydownEventsFor(allCubes[7]);
-// addKeydownEventsFor(theCube);
-cameraTest();
+if (autoRotate) {
+  cameraTest();
+}
 
 for (let i = 0; i < allCubes.length; i += 1) {
-  markUpCube(allCubes[i]);
+  // markUpCube(allCubes[i]);
 }
 
 // commands(randomCube(1000));
@@ -786,3 +771,4 @@ for (let i = 0; i < allCubes.length; i += 1) {
 // setTimeout(() => {
 //   commands("L B U B' R' L' U' L B' U L L B' R' D' R R D' F' U");
 // }, 2000);
+let str = randomCube(100); executeCommands(str); reverseCommands(str);
