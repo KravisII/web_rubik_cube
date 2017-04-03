@@ -14,6 +14,9 @@
 /* Global Values */
 const faceRatio = 0.5;
 
+let canvasHeight = 0;
+let canvasWidth = 0;
+
 let canvasElement;
 let renderer;
 let scene;
@@ -190,12 +193,15 @@ function changePivot(x, y, z, obj) {
 
 /* init Three.js */
 function initThree() {
+  const wrapper = document.querySelector('.canvas-wrapper');
+  canvasHeight = wrapper.clientHeight;
+  canvasWidth = wrapper.clientWidth;
   canvasElement = document.querySelector('.main-canvas');
   renderer = new THREE.WebGLRenderer({
     antialiasing: true,
     canvas: canvasElement,
   });
-  renderer.setSize(500, 500);
+  renderer.setSize(canvasWidth, canvasHeight);
   renderer.setClearColor(0xffffff);
   renderer.setPixelRatio(window.devicePixelRatio);
 }
@@ -205,7 +211,7 @@ function initScene() {
 }
 
 function initCamera() {
-  camera = new THREE.PerspectiveCamera(45, 5 / 5, 1, 50);
+  camera = new THREE.PerspectiveCamera(45, canvasWidth / canvasHeight, 1, 50);
   camera.position.set(-6, 12, 15);
   camera.lookAt({ x: 3, y: 3, z: 3 });
   scene.add(camera);
@@ -771,4 +777,5 @@ for (let i = 0; i < allCubes.length; i += 1) {
 // setTimeout(() => {
 //   commands("L B U B' R' L' U' L B' U L L B' R' D' R R D' F' U");
 // }, 2000);
-let str = randomCube(100); executeCommands(str); reverseCommands(str);
+
+// let str = randomCube(100); executeCommands(str); reverseCommands(str);
