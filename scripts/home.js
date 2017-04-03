@@ -2,12 +2,14 @@
 /* eslint no-console: off, strict: off, no-underscore-dangle: off*/
 /* global THREE, TWEEN, Stats*/
 // 使用数组记录旋转面
+// GIVEUP: 对 requestAnimationFrame 的改进（魔方崩坏）
+
 // TODO: 添加面小块标记
 // TODO: 检测是否还原
-// TODO: 添加照相机移动轨迹，90度旋转
 // TODO: MVC 分离
+// TODO: 自动设置宽高，对 iOS 优化设置，设置上限
 
-// GIVEUP: 对 requestAnimationFrame 的改进（魔方崩坏）
+// TODO: 添加照相机移动轨迹，90度旋转
 
 'use strict';
 
@@ -73,7 +75,7 @@ function randomCube(steps) {
 }
 
 function cameraTest() {
-  let time = 0;
+  let time = 1;
   // document.addEventListener('keydown', (event) => {
   // 轨迹方程（设 y = 3 为中心轴）
   // var origin = camera.position.clone();
@@ -92,22 +94,39 @@ function cameraTest() {
   dummy.position.set(-6, 12, 15);
   dummy.lookAt({ x: 3, y: 3, z: 3 });
 
+  var origin = dummy.position.clone();
+  var alpha = Math.atan((origin.z - 3) / (origin.x - 3));
+
   const tween = new TWEEN.Tween(dummy.position);
-  tween.to({
-    // x: 15,
-    // y: 12,
-    // z: 12,
-  }, 1000);
-  tween.onUpdate(() => {
-    time += 1;
+  tween.to({}, 10000);
+  tween.onUpdate((e) => {
+    time = (1 - 0.5 * e);
     dummy.lookAt({ x: 3, y: 3, z: 3 });
     dummy.up.set(0, 1, 0);
-    dummy.position.z = (Math.cos(time / 100) * 15) + 3;
-    dummy.position.x = (Math.sin(time / 100) * 15) + 3;
+
+    dummy.position.x = (Math.cos(alpha + (Math.PI) * time) * 15) + 3;
+    dummy.position.z = (Math.sin(alpha + (Math.PI) * time) * 15) + 3;
+
+    console.log(dummy.position);
   });
   tween.onComplete(() => {});
   tween.repeat(Infinity);
   tween.start();
+}
+
+let controls;
+function orbit() {
+  controls = new THREE.OrbitControls(camera);
+  // camera.position.set(-6, 12, 15);
+  camera.lookAt({ x: 3, y: 3, z: 3 });
+  // camera.up.set(-1,0,0);
+  controls.target.set(3, 3, 3);
+  // controls.enableDamping = true;
+  // controls.dampingFactor = 0.25;
+  controls.dispose();
+  controls.autoRotate = true;
+  controls.enableZoom = false;
+
 }
 
 function addKeydownEventsFor(_obj) {
@@ -742,6 +761,7 @@ function loop() {
     executeRotation();
   }
   TWEEN.update();
+  controls.update();
   renderer.render(scene, camera);
   stats.end();
 }
@@ -757,12 +777,13 @@ function startThree() {
   /* initLight(); */
   initObject();
   renderer.clear();
+  orbit();
   loop();
   // setInterval(loop, 10);
 }
 
 startThree();
-addKeydownEventsFor(allCubes[7]);
+// addKeydownEventsFor(allCubes[7]);
 if (autoRotate) {
   cameraTest();
 }
