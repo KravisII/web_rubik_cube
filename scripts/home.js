@@ -23,6 +23,7 @@ let canvasElement;
 let renderer;
 let scene;
 let camera;
+let controls;
 let mesh;
 let theCube;
 
@@ -33,13 +34,14 @@ let downArray = [];
 let leftArray = [];
 let backArray = [];
 
-const rotationTaskList = [];
+let rotationTaskList = [];
+let rotationTaskCache = [];
 
 const allCubes = [];
 let loopID;
 
 let isRotating = false;
-let autoRotate = false;
+// let autoRotate = false;
 
 let duration = 500;
 
@@ -74,59 +76,17 @@ function randomCube(steps) {
   return (commandArray.join(' '));
 }
 
-function cameraTest() {
-  let time = 1;
-  // document.addEventListener('keydown', (event) => {
-  // 轨迹方程（设 y = 3 为中心轴）
-  // var origin = camera.position.clone();
-  // var alpha = Math.atan((origin.z - 3) / (origin.x - 3));
-  // var x = (Math.cos(alpha + (Math.PI / 2)) * 15) + 3;
-  // var z = (Math.sin(alpha + (Math.PI / 2)) * 15) + 3;
-
-  const dummy = new THREE.Group();
-
-  dummy.add(camera);
-  scene.add(dummy);
-
-  camera.position.set(0, 0, 0);
-  camera.rotation.set(-Math.PI, 0, -Math.PI);
-
-  dummy.position.set(-6, 12, 15);
-  dummy.lookAt({ x: 3, y: 3, z: 3 });
-
-  var origin = dummy.position.clone();
-  var alpha = Math.atan((origin.z - 3) / (origin.x - 3));
-
-  const tween = new TWEEN.Tween(dummy.position);
-  tween.to({}, 10000);
-  tween.onUpdate((e) => {
-    time = (1 - 0.5 * e);
-    dummy.lookAt({ x: 3, y: 3, z: 3 });
-    dummy.up.set(0, 1, 0);
-
-    dummy.position.x = (Math.cos(alpha + (Math.PI) * time) * 15) + 3;
-    dummy.position.z = (Math.sin(alpha + (Math.PI) * time) * 15) + 3;
-
-    console.log(dummy.position);
-  });
-  tween.onComplete(() => {});
-  tween.repeat(Infinity);
-  tween.start();
-}
-
-let controls;
 function orbit() {
   controls = new THREE.OrbitControls(camera);
   // camera.position.set(-6, 12, 15);
   camera.lookAt({ x: 3, y: 3, z: 3 });
-  // camera.up.set(-1,0,0);
-  controls.target.set(3, 3, 3);
-  // controls.enableDamping = true;
-  // controls.dampingFactor = 0.25;
-  controls.dispose();
-  controls.autoRotate = true;
-  controls.enableZoom = false;
 
+  controls.target.set(3, 3, 3);
+  controls.autoRotate = false;
+  controls.enableZoom = false;
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.125;
+  controls.dispose();
 }
 
 function addKeydownEventsFor(_obj) {
@@ -173,6 +133,26 @@ function addKeydownEventsFor(_obj) {
       case 'z':
       case 'U+005A':
         innerObj.rotation.z += Math.PI * 0.1;
+        break;
+      default:
+        break;
+    }
+  }, false);
+}
+
+function addKeydownEventsForOrbit() {
+  document.addEventListener('keydown', (event) => {
+    const keyName = event.key || event.keyIdentifier;
+    switch (keyName) {
+      case 'ArrowLeft':
+      case 'Left':
+        event.preventDefault();
+        controls.rotateLeft(Math.PI * (1 / 16));
+        break;
+      case 'ArrowRight':
+      case 'Right':
+        event.preventDefault();
+        controls.rotateLeft(-Math.PI * (1 / 16));
         break;
       default:
         break;
@@ -649,11 +629,13 @@ function command(token) {
   } else {
     throw new TypeError(`${token} 不是合法的命令`);
   }
+  const obj = { facelet, direction: clockDirection };
 
-  rotationTaskList.push({
-    'facelet': facelet,
-    'direction': clockDirection,
-  });
+  if (!isRotating) {
+    rotationTaskList.push(obj);
+  } else {
+    rotationTaskCache.push(obj);
+  }
 }
 
 function isReverseToken(a, b) {
@@ -757,8 +739,12 @@ function executeCommands(str) {
 function loop() {
   stats.begin();
   loopID = requestAnimationFrame(loop);
-  if (rotationTaskList.length !== 0 && !isRotating) {
+  if (rotationTaskList.length > 0 && !isRotating) {
     executeRotation();
+  }
+  if (rotationTaskList.length === 0 && !isRotating) {
+    rotationTaskList = rotationTaskList.concat(rotationTaskCache);
+    rotationTaskCache = [];
   }
   TWEEN.update();
   controls.update();
@@ -784,9 +770,7 @@ function startThree() {
 
 startThree();
 // addKeydownEventsFor(allCubes[7]);
-if (autoRotate) {
-  cameraTest();
-}
+addKeydownEventsForOrbit();
 
 for (let i = 0; i < allCubes.length; i += 1) {
   // markUpCube(allCubes[i]);
