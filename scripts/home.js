@@ -4,17 +4,17 @@
 // 使用数组记录旋转面
 // GIVEUP: 对 requestAnimationFrame 的改进（魔方崩坏）
 
-// TODO: 添加面小块标记
+// TODO: 添加 Z 轴和 X 轴的相机移动轨迹
 // TODO: 检测是否还原
 // TODO: MVC 分离
 // TODO: 自动设置宽高，对 iOS 优化设置，设置上限
 
-// TODO: 添加照相机移动轨迹，90度旋转
+// TODO: 添加面小块标记
 
 'use strict';
 
 /* Global Values */
-const faceRatio = 0.5;
+const faceRatio = 2;
 
 let canvasHeight = 0;
 let canvasWidth = 0;
@@ -78,10 +78,9 @@ function randomCube(steps) {
 
 function orbit() {
   controls = new THREE.OrbitControls(camera);
-  // camera.position.set(-6, 12, 15);
   camera.lookAt({ x: 3, y: 3, z: 3 });
-
   controls.target.set(3, 3, 3);
+
   controls.autoRotate = false;
   controls.enableZoom = false;
   controls.enableDamping = true;
@@ -146,11 +145,13 @@ function addKeydownEventsForOrbit() {
     switch (keyName) {
       case 'ArrowLeft':
       case 'Left':
+      case 'UIKeyInputLeftArrow':
         event.preventDefault();
         controls.rotateLeft(Math.PI * (1 / 16));
         break;
       case 'ArrowRight':
       case 'Right':
+      case 'UIKeyInputRightArrow':
         event.preventDefault();
         controls.rotateLeft(-Math.PI * (1 / 16));
         break;
@@ -158,6 +159,18 @@ function addKeydownEventsForOrbit() {
         break;
     }
   }, false);
+}
+
+function disableScroll() {
+  document.querySelector('body').classList.toggle('disable-scroll');
+  document.ontouchmove = (e) => {
+    e.preventDefault();
+  };
+}
+
+function enableScroll() {
+  document.querySelector('body').removeAttribute('class');
+  document.ontouchmove = null;
 }
 
 function markUpCube(_obj) {
@@ -190,19 +203,52 @@ function changePivot(x, y, z, obj) {
   return wrapper;
 }
 
-/* init Three.js */
-function initThree() {
+function resizeCanvas() {
   const wrapper = document.querySelector('.canvas-wrapper');
   canvasHeight = wrapper.clientHeight;
   canvasWidth = wrapper.clientWidth;
+  if (canvasHeight !== canvasWidth) {
+    const min = Math.min(canvasWidth, canvasHeight, 600);
+    canvasHeight = min;
+    canvasWidth = min;
+  }
+  renderer.setSize(canvasWidth, canvasHeight);
+
+  if (camera) {
+    camera.aspect = canvasWidth / canvasHeight;
+    camera.updateProjectionMatrix();
+  }
+
+  // ----------------------
+  // Show log in wrapper
+  let log = document.querySelector('.log');
+  if (log) {
+    log.innerText = `${canvasWidth}, ${canvasHeight}`;
+  } else {
+    log = document.createElement('div');
+    log.classList.add('log');
+    log.style.position = 'fixed';
+    log.style.bottom = '0';
+    log.style.right = '0';
+    log.innerText = `${canvasWidth}, ${canvasHeight}`;
+    wrapper.appendChild(log);
+  }
+  // ----------------------
+}
+
+window.addEventListener('resize', resizeCanvas, false);
+
+/* init Three.js */
+function initThree() {
   canvasElement = document.querySelector('.main-canvas');
   renderer = new THREE.WebGLRenderer({
     antialiasing: true,
     canvas: canvasElement,
+    alpha: true,
   });
-  renderer.setSize(canvasWidth, canvasHeight);
-  renderer.setClearColor(0xffffff);
-  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setClearColor(0xFF0000, 0);
+  renderer.setPixelRatio(window.devicePixelRatio * 2);
+  resizeCanvas();
 }
 
 function initScene() {
@@ -210,7 +256,8 @@ function initScene() {
 }
 
 function initCamera() {
-  camera = new THREE.PerspectiveCamera(45, canvasWidth / canvasHeight, 1, 50);
+  // https://github.com/mrdoob/three.js/issues/69
+  camera = new THREE.PerspectiveCamera(45, 1, 1, 50);
   camera.position.set(-6, 12, 15);
   camera.lookAt({ x: 3, y: 3, z: 3 });
   scene.add(camera);
@@ -255,10 +302,10 @@ function getFace(faceCode) {
     case 'N':
       // TODO: 优化
       const canvas = document.createElement('canvas');
-      canvas.width = 16 * faceRatio;
-      canvas.height = 16 * faceRatio;
+      canvas.width = 8;
+      canvas.height = 8;
       const ctx = canvas.getContext('2d');
-      ctx.fillStyle = 'black';
+      ctx.fillStyle = 'rgba(0, 0, 0, 1)';
       ctx.fillRect(0, 0, 16, 16);
       return canvas;
     default:
@@ -773,6 +820,7 @@ startThree();
 addKeydownEventsForOrbit();
 
 for (let i = 0; i < allCubes.length; i += 1) {
+  // TODO: 清除闪烁，可能由内侧不透明 texture 引起
   // markUpCube(allCubes[i]);
 }
 
