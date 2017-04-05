@@ -3,13 +3,9 @@
 /* global THREE, TWEEN, Stats*/
 // 使用数组记录旋转面
 // GIVEUP: 对 requestAnimationFrame 的改进（魔方崩坏）
+// GIVEUP: 添加 Z 轴和 X 轴的相机移动轨迹
 
-// TODO: 添加 Z 轴和 X 轴的相机移动轨迹
-// TODO: 检测是否还原
 // TODO: MVC 分离
-// TODO: 自动设置宽高，对 iOS 优化设置，设置上限
-
-// TODO: 添加面小块标记
 
 'use strict';
 
@@ -43,7 +39,7 @@ let loopID;
 let isRotating = false;
 // let autoRotate = false;
 
-let duration = 500;
+let duration = 2000;
 
 // const colors = [0xff3b30, 0xff9500, 0xffcc00, 0x4cd964, 0x5ac8fa, 0x007AFF, 0x5856D6, 0xFF2C55];
 
@@ -86,57 +82,7 @@ function orbit() {
   controls.enableDamping = true;
   controls.dampingFactor = 0.125;
   controls.dispose();
-}
-
-function addKeydownEventsFor(_obj) {
-  const innerObj = _obj;
-  document.addEventListener('keydown', (event) => {
-    const keyName = event.key || event.keyIdentifier;
-    switch (keyName) {
-      case 'ArrowLeft':
-      case 'Left':
-        event.preventDefault();
-        innerObj.position.x -= 0.2;
-        break;
-      case 'ArrowRight':
-      case 'Right':
-        event.preventDefault();
-        innerObj.position.x += 0.2;
-        break;
-      case 'ArrowUp':
-      case 'Up':
-        event.preventDefault();
-        innerObj.position.y += 0.2;
-        break;
-      case 'ArrowDown':
-      case 'Down':
-        event.preventDefault();
-        innerObj.position.y -= 0.2;
-        break;
-      case '[':
-      case 'U+005B':
-        innerObj.position.z -= 0.2;
-        break;
-      case ']':
-      case 'U+005D':
-        innerObj.position.z += 0.2;
-        break;
-      case 'x':
-      case 'U+0058':
-        innerObj.rotation.x += Math.PI * 0.1;
-        break;
-      case 'y':
-      case 'U+0059':
-        innerObj.rotation.y += Math.PI * 0.1;
-        break;
-      case 'z':
-      case 'U+005A':
-        innerObj.rotation.z += Math.PI * 0.1;
-        break;
-      default:
-        break;
-    }
-  }, false);
+  // TODO: 优化 CSS 属性
 }
 
 function addKeydownEventsForOrbit() {
@@ -155,6 +101,18 @@ function addKeydownEventsForOrbit() {
         event.preventDefault();
         controls.rotateLeft(-Math.PI * (1 / 16));
         break;
+      case 'ArrowUp':
+      case 'Up':
+      case 'UIKeyInputUpArrow':
+        event.preventDefault();
+        controls.rotateUp(Math.PI * (1 / 64));
+        break;
+      case 'ArrowDown':
+      case 'Down':
+      case 'UIKeyInputDownArrow':
+        event.preventDefault();
+        controls.rotateUp(-Math.PI * (1 / 64));
+        break;
       default:
         break;
     }
@@ -171,21 +129,6 @@ function disableScroll() {
 function enableScroll() {
   document.querySelector('body').removeAttribute('class');
   document.ontouchmove = null;
-}
-
-function markUpCube(_obj) {
-  const objInner = _obj;
-  for (let i = 0; i < objInner.material.materials.length; i += 1) {
-    objInner.material.materials[i].opacity = 0.6;
-    objInner.material.materials[i].transparent = true;
-  }
-}
-
-function remarkUpCube(_obj) {
-  const objInner = _obj;
-  for (let i = 0; i < objInner.material.materials.length; i += 1) {
-    objInner.material.materials[i].transparent = false;
-  }
 }
 
 /* Stats Function */
@@ -263,21 +206,6 @@ function initCamera() {
   scene.add(camera);
 }
 
-function initLight() {
-  const lights = [];
-  lights[0] = new THREE.PointLight(0xffffff, 1, 0);
-  lights[1] = new THREE.PointLight(0xffffff, 1, 0);
-  lights[2] = new THREE.PointLight(0xffffff, 1, 0);
-
-  lights[0].position.set(0, 200, 0);
-  lights[1].position.set(100, 200, 100);
-  lights[2].position.set(-100, -200, -100);
-
-  scene.add(lights[0]);
-  scene.add(lights[1]);
-  scene.add(lights[2]);
-}
-
 function getFace(faceCode) {
   let color = 'rgb(0, 0, 0)';
   switch (faceCode) {
@@ -347,7 +275,7 @@ function createCubes() {
         if (y === 5) {
           cubeName += 'U';
           myFaces[2] = getFace('U');
-          myFaces[5] = getFace('N');
+          myFaces[3] = getFace('N');
         }
         if (x === 1) {
           cubeName += 'L';
@@ -384,19 +312,41 @@ function createCubes() {
           // TODO: THREE.MultiMaterial has been removed. Use an Array instead.
           materials.push(new THREE.MeshBasicMaterial({
             map: texture,
-            name: i,
             side: THREE.DoubleSide,
           }));
         }
         const cubemat = new THREE.MultiMaterial(materials);
         const cube = new THREE.Mesh(geometryCube, cubemat);
         cube.position.set(x, y, z);
-        cube.name = cubeName;
+        cube.name = formatName(cubeName);
         mesh.add(cube);
         allCubes.push(cube);
       }
     }
   }
+}
+
+function formatName(str) {
+  const codeArray = [];
+  const codeObj = {
+    R: 0,
+    L: 1,
+    U: 2,
+    D: 3,
+    F: 4,
+    B: 5,
+  };
+  for (let i = 0; i < str.length; i += 1) {
+    const code = str[i];
+    const index = codeObj[code];
+    codeArray[index] = code;
+  }
+  for (let i = 0; i < 6; i += 1) {
+    if (codeArray[i] === undefined) {
+      codeArray[i] = '#';
+    }
+  }
+  return codeArray.join('');
 }
 
 function createFacelets() {
@@ -452,9 +402,109 @@ function getCubesName(array) {
   }
 }
 
+function exportCubeState() {
+  // Singmaster:
+  // UF UR UB UL
+  // DF DR DB DL
+  // FR FL BR BL
+  // UFR URB UBL ULF
+  // DRF DFL DLB DBR
+  const array = [];
+  array.push(`${upArray[1].name[2]}${upArray[1].name[4]} `);
+  array.push(`${upArray[5].name[2]}${upArray[5].name[0]} `);
+  array.push(`${upArray[7].name[2]}${upArray[7].name[5]} `);
+  array.push(`${upArray[3].name[2]}${upArray[3].name[1]} `);
+
+  array.push(`${downArray[7].name[3]}${downArray[7].name[4]} `);
+  array.push(`${downArray[5].name[3]}${downArray[5].name[0]} `);
+  array.push(`${downArray[1].name[3]}${downArray[1].name[5]} `);
+  array.push(`${downArray[3].name[3]}${downArray[3].name[1]} `);
+
+  array.push(`${frontArray[5].name[4]}${frontArray[5].name[0]} `);
+  array.push(`${frontArray[3].name[4]}${frontArray[3].name[1]} `);
+  array.push(`${backArray[3].name[5]}${backArray[3].name[0]} `);
+  array.push(`${backArray[5].name[5]}${backArray[5].name[1]} `);
+
+  array.push(`${upArray[2].name[2]}${upArray[2].name[4]}${upArray[2].name[0]} `);
+  array.push(`${upArray[8].name[2]}${upArray[8].name[0]}${upArray[8].name[5]} `);
+  array.push(`${upArray[6].name[2]}${upArray[6].name[5]}${upArray[6].name[1]} `);
+  array.push(`${upArray[0].name[2]}${upArray[0].name[1]}${upArray[0].name[4]} `);
+
+  array.push(`${downArray[8].name[3]}${downArray[8].name[0]}${downArray[8].name[4]} `);
+  array.push(`${downArray[6].name[3]}${downArray[6].name[4]}${downArray[6].name[1]} `);
+  array.push(`${downArray[0].name[3]}${downArray[0].name[1]}${downArray[0].name[5]} `);
+  array.push(`${downArray[2].name[3]}${downArray[2].name[5]}${downArray[2].name[0]} `);
+  return (array.join(''));
+}
+
+function facesChange(str, facelet, direction) {
+  const resultArray = ['#', '#', '#', '#', '#', '#'];
+  const originArray = Array.from(str);
+
+  if ((facelet === 'L' && direction === 1) ||
+    (facelet === 'R' && direction === -1)) {
+    resultArray[0] = originArray[0];
+    resultArray[1] = originArray[1];
+    resultArray[4] = originArray[2];
+    resultArray[3] = originArray[4];
+    resultArray[5] = originArray[3];
+    resultArray[2] = originArray[5];
+  }
+  if ((facelet === 'L' && direction === -1) ||
+    (facelet === 'R' && direction === 1)) {
+    resultArray[0] = originArray[0];
+    resultArray[1] = originArray[1];
+    resultArray[2] = originArray[4];
+    resultArray[4] = originArray[3];
+    resultArray[3] = originArray[5];
+    resultArray[5] = originArray[2];
+  }
+
+  if ((facelet === 'U' && direction === 1) ||
+    (facelet === 'D' && direction === -1)) {
+    resultArray[2] = originArray[2];
+    resultArray[3] = originArray[3];
+    resultArray[0] = originArray[5];
+    resultArray[4] = originArray[0];
+    resultArray[1] = originArray[4];
+    resultArray[5] = originArray[1];
+  }
+  if ((facelet === 'U' && direction === -1) ||
+    (facelet === 'D' && direction === 1)) {
+    resultArray[2] = originArray[2];
+    resultArray[3] = originArray[3];
+    resultArray[5] = originArray[0];
+    resultArray[0] = originArray[4];
+    resultArray[4] = originArray[1];
+    resultArray[1] = originArray[5];
+  }
+
+  if ((facelet === 'F' && direction === 1) ||
+    (facelet === 'B' && direction === -1)) {
+    resultArray[4] = originArray[4];
+    resultArray[5] = originArray[5];
+    resultArray[0] = originArray[2];
+    resultArray[3] = originArray[0];
+    resultArray[1] = originArray[3];
+    resultArray[2] = originArray[1];
+  }
+  if ((facelet === 'F' && direction === -1) ||
+    (facelet === 'B' && direction === 1)) {
+    resultArray[4] = originArray[4];
+    resultArray[5] = originArray[5];
+    resultArray[2] = originArray[0];
+    resultArray[0] = originArray[3];
+    resultArray[3] = originArray[1];
+    resultArray[1] = originArray[2];
+  }
+  // console.log(originArray);
+  // console.log(resultArray);
+  return resultArray.join('');
+}
+
 function executeRotation() {
   isRotating = true;
-  const cmd = rotationTaskList.pop();
+  const cmd = rotationTaskList.shift();
   const [facelet, direction] = [cmd.facelet, cmd.direction];
   let group;
   let activeArray;
@@ -589,7 +639,13 @@ function executeRotation() {
         }
       }
     }
+    // ___________________TEST START___________________
 
+    for (let i = 0; i < activeArray.length; i += 1) {
+      activeArray[i].name = facesChange(activeArray[i].name, facelet, direction);
+    }
+
+    // ___________________TEST END.  ___________________
     switch (facelet) {
       case 'U':
         upArray = activeArray.concat();
@@ -643,7 +699,11 @@ function executeRotation() {
     }
     scene.remove(group);
     isRotating = false;
+    let state = exportCubeState();
     console.log(stepCount++);
+    if (state === "UF UR UB UL DF DR DB DL FR FL BR BL UFR URB UBL ULF DRF DFL DLB DBR ") {
+      console.log('还原完成。');
+    }
   });
   rotationTask.start();
 }
@@ -807,28 +867,16 @@ function startThree() {
   initThree();
   initScene();
   initCamera();
-  /* initLight(); */
   initObject();
   renderer.clear();
   orbit();
   loop();
-  // setInterval(loop, 10);
 }
 
 startThree();
-// addKeydownEventsFor(allCubes[7]);
 addKeydownEventsForOrbit();
 
 for (let i = 0; i < allCubes.length; i += 1) {
   // TODO: 清除闪烁，可能由内侧不透明 texture 引起
   // markUpCube(allCubes[i]);
 }
-
-// commands(randomCube(1000));
-
-// commands("L' L' D' U' R F D L' L' F' F U F' B' D' F' F' U' D' F D' L' F' F U' U U F' R U F' B F' D' F D U' R B F U' B' B R' U' B B' B' B U'");
-// setTimeout(() => {
-//   commands("L B U B' R' L' U' L B' U L L B' R' D' R R D' F' U");
-// }, 2000);
-
-// let str = randomCube(100); executeCommands(str); reverseCommands(str);
