@@ -2,7 +2,6 @@
 /* eslint no-console: off, strict: off, no-underscore-dangle: off*/
 /* global THREE, TWEEN, Stats*/
 // 使用数组记录旋转面
-
 // GIVEUP: 对 requestAnimationFrame 的改进（魔方崩坏）
 // GIVEUP: 添加 Z 轴和 X 轴的相机移动轨迹
 // GIVEUP: 清除闪烁，可能由内侧不透明 texture 引起
@@ -229,17 +228,17 @@ function getFace(faceCode) {
     case 'B':
       color = 'rgb(0, 122, 255)';
       break;
+    case 'N':
+      // TODO: 优化
+      const canvas = document.createElement('canvas');
+      canvas.width = 8;
+      canvas.height = 8;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = 'rgba(0, 0, 0, 1)';
+      ctx.fillRect(0, 0, 16, 16);
+      return canvas;
     default:
       break;
-  }
-  if (faceCode === 'N') {
-    const canvas = document.createElement('canvas');
-    canvas.width = 8;
-    canvas.height = 8;
-    const ctx = canvas.getContext('2d');
-    ctx.fillStyle = 'rgba(0, 0, 0, 1)';
-    ctx.fillRect(0, 0, 16, 16);
-    return canvas;
   }
   const canvas = document.createElement('canvas');
   const outterWidth = 512;
@@ -875,3 +874,22 @@ function startThree() {
 
 startThree();
 addKeydownEventsForOrbit();
+
+function markUpCube(_obj) {
+  const objInner = _obj;
+  for (let i = 0; i < objInner.material.materials.length; i += 1) {
+    objInner.material.materials[i].opacity = 0.6;
+    objInner.material.materials[i].transparent = true;
+  }
+}
+
+function remarkUpCube(_obj) {
+  const objInner = _obj;
+  for (let i = 0; i < objInner.material.materials.length; i += 1) {
+    objInner.material.materials[i].transparent = false;
+  }
+}
+
+for (let i = 0; i < allCubes.length; i += 1) {
+  // markUpCube(allCubes[i]);
+}
