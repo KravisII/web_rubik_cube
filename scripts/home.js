@@ -75,7 +75,7 @@ function randomCube(steps) {
 }
 
 function orbit() {
-  controls = new THREE.OrbitControls(camera);
+  controls = new THREE.OrbitControls(camera, canvasElement);
   camera.lookAt({ x: 3, y: 3, z: 3 });
   controls.target.set(3, 3, 3);
 
@@ -86,7 +86,6 @@ function orbit() {
   controls.dampingFactor = 0.125;
   controls.enablePan = false;
   // controls.dispose();
-  // TODO: 优化 CSS 属性 非 absolute 才有用
 }
 
 function addKeydownEventsForOrbit() {
