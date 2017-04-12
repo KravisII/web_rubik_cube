@@ -17,8 +17,4 @@ body {
 
 }
 
-.main-canvas {
-  --width: 600px;
-  /* width: var(--width) !important; */
-  /* height: var(--width) !important; */
-}
+.main-canvas {}
