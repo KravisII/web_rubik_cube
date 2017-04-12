@@ -82,9 +82,11 @@ function orbit() {
   controls.autoRotate = false;
   controls.enableZoom = false;
   controls.enableDamping = true;
+  controls.rotateSpeed = 0.1;
   controls.dampingFactor = 0.125;
-  controls.dispose();
-  // TODO: 优化 CSS 属性 fixed 才有用
+  controls.enablePan = false;
+  // controls.dispose();
+  // TODO: 优化 CSS 属性 非 absolute 才有用
 }
 
 function addKeydownEventsForOrbit() {
