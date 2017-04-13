@@ -159,8 +159,8 @@ function changePivot(x, y, z, obj) {
 
 function resizeCanvas() {
   const wrapper = document.querySelector('.canvas-wrapper');
-  canvasHeight = wrapper.clientHeight;
-  canvasWidth = wrapper.clientWidth;
+  canvasHeight = window.innerHeight;
+  canvasWidth = window.innerWidth;
   if (canvasHeight !== canvasWidth) {
     const min = Math.min(canvasWidth, canvasHeight, 600);
     canvasHeight = min;

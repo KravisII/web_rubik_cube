@@ -3,7 +3,7 @@
 
 <head>
   <meta charset='utf-8'>
-  <meta name='viewport' content='width=device-width'>
+  <meta name="viewport" content="initial-scale=1.0,maximum-scale=1.0, user-scalable=no">
   <title>Web Rubik's Cube</title>
   <link rel="stylesheet" type="text/css" href="./styles/home.css">
   <style type="text/css">
@@ -12,12 +12,30 @@
     --center-padding: 1.5em;
     --border-color: #B3B2B3;
     --ios-border-width: 0.5px;
+    --tab-height: 3em;
+  }
+  .disable {
+    display: none;
+  }
+  .center-frame {
+    max-width: 1080px;
+    min-width: 320px;
+    margin: 0 auto;
+    padding: 0 var(--center-padding);
+  }
+
+  .absolute-frame {
+    position: absolute;
   }
 
   .global-header {
-    position: fixed;
+    top: 0;
+    left: 0;
     width: 100%;
     border-bottom: var(--ios-border-width) solid var(--border-color);
+    z-index: 10;
+    box-sizing: border-box;
+    height: var(--tab-height);
   }
 
   .bg-blur {
@@ -31,14 +49,18 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    height: 3.5em;
+    height: 100%;
   }
 
-  .center-frame {
-    max-width: 1080px;
-    min-width: 320px;
-    margin: 0 auto;
-    padding: 0 var(--center-padding);
+  .canvas-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: var(--tab-height);
+    bottom: var(--tab-height);
+    padding: 0;
   }
 
   .gh-left {}
@@ -74,20 +96,16 @@
   }
 
   .curtain {
-    display: none;
-    position: absolute;
+    z-index: 15;
     top: 0;
-    background: rgba(0, 0, 0, 0.6);
-    height: 100%;
+    bottom: var(--tab-height);
     width: 100%;
-    z-index: 10;
+    background: rgba(0, 0, 0, 0);
   }
 
   .control-wrapper {
-    /* display: none; */
     z-index: 20;
-    position: fixed;
-    bottom: 0;
+    bottom: var(--tab-height);
     left: 0;
     right: 0;
     border-top: var(--ios-border-width) solid var(--border-color);
@@ -105,37 +123,45 @@
     justify-content: space-between;
   }
 
-  .cw-footer {
-    /* height: 3em; */
+  .global-footer {
+    width: 100%;
+    height: var(--tab-height);
+    box-sizing: border-box;
+    bottom: 0;
+    left: 0;
     border-top: var(--ios-border-width) solid var(--border-color);
-    padding: 6px var(--center-padding) 2px;
+    z-index: 20;
   }
 
-  .cw-icon-list {
-    margin: 0 auto;
+  .gf-wrapper {
+    height: 100%;
+  }
+
+  .gf-icon-list {
+    height: 100%;
+    margin: 0;
     padding: 0;
     display: flex;
-    max-width: 1080px;
-    min-width: 320px;
-    flex-flow: row nowrap;
+    flex-direction: row;
     list-style: none;
+    align-items: center;
     justify-content: space-around;
   }
 
-  .cw-list-item {
+  .gf-list-item {
     flex-grow: 1;
     display: flex;
-    flex-flow: column nowrap;
+    flex-direction: column;
     align-items: center;
-    cursor: pointer;
     opacity: 0.4;
+    transition: opacity .3s ease-out;
   }
 
-  .cw-list-item.active {
+  .gf-list-item.active {
     opacity: 1;
   }
 
-  .cw-list-item .botton-text {
+  .gf-list-item .botton-text {
     font-size: 12px;
     margin-top: 3px;
   }
@@ -143,17 +169,17 @@
 </head>
 
 <body>
-  <header class="global-header bg-blur">
+  <header class="global-header bg-blur absolute-frame">
     <div class="gh-wrapper center-frame">
       <div class="gh-left">Rubik's Cube</div>
       <div class="gh-right"></div>
     </div>
   </header>
-  <div class="canvas-wrapper">
+  <div class="canvas-wrapper absolute-frame">
     <canvas class="main-canvas"></canvas>
   </div>
-  <div class="curtain"></div>
-  <div class="control-wrapper bg-blur">
+  <div class="curtain absolute-frame disable"></div>
+  <div class="control-wrapper bg-blur absolute-frame disable">
     <div class="cw-inner center-frame">
       <header class="cw-header">
         <div class="cw-left"></div>
@@ -163,7 +189,7 @@
       </header>
       <div class="cw-sections">
         <div class="user-section">
-          <ul style="margin:0; padding:0; list-style:none;">
+          <ul>
             <li><span>Kravis Lau</span></li>
             <li>History</li>
             <li><a href="#">Change Password</a></li>
@@ -175,23 +201,25 @@
         <div class="command-section"></div>
       </div>
     </div>
-    <footer class="cw-footer">
-      <ul class="cw-icon-list">
-        <li class="cw-list-item user active">
+  </div>
+  <footer class="global-footer bg-blur absolute-frame">
+    <div class="gf-wrapper center-frame">
+      <ul class="gf-icon-list">
+        <li class="gf-list-item user">
           <span class="user botton-icon"></span>
           <spna class="user botton-text">User</spna>
         </li>
-        <li class="cw-list-item command">
+        <li class="gf-list-item command">
           <span class="command botton-icon"></span>
           <spna class="command botton-text">Command</spna>
         </li>
-        <li class="cw-list-item setting">
+        <li class="gf-list-item setting">
           <span class="setting botton-icon"></span>
           <spna class="setting botton-text">Setting</spna>
         </li>
       </ul>
-    </footer>
-  </div>
+    </div>
+  </footer>
   <script type="text/javascript" src="./scripts/lib/three.min.js"></script>
   <script type="text/javascript" src="./scripts/lib/Tween.min.js"></script>
   <script type="text/javascript" src="./scripts/lib/OrbitControls.js"></script>
