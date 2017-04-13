@@ -8,6 +8,7 @@
   <link rel="stylesheet" type="text/css" href="./styles/home.css">
   <style type="text/css">
   body {
+    font-family: 'Myriad Set Pro', -apple-system, -apple-system-font, 'Helvetica Neue', Arial, 'PingFang SC', 'Hiragino Sans GB', STHeiti, 'Microsoft YaHei', 'Microsoft JhengHei', 'Source Han Sans SC', 'Noto Sans CJK SC', 'Source Han Sans CN', 'Noto Sans SC', 'Source Han Sans TC', 'Noto Sans CJK TC', 'WenQuanYi Micro Hei', SimSun, sans-serif;
     --center-padding: 1.5em;
     --border-color: #B3B2B3;
   }
@@ -15,7 +16,7 @@
   .global-header {
     position: fixed;
     width: 100%;
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: .5px solid var(--border-color);
   }
 
   .bg-blur {
@@ -41,23 +42,7 @@
 
   .gh-left {}
 
-  .gh-icon-list {
-    margin: 0;
-    padding: 0;
-  }
-
-  .gh-icon-list li {
-    display: inline-block;
-  }
-
-  .gh-icon-list li + li {
-    margin-left: 1.75em;
-  }
-
-  .gh-icon-list li a {}
-
   .botton-icon {
-    display: inline-block;
     height: 1.25em;
     width: 1.25em;
     background-size: 1.25em;
@@ -66,21 +51,27 @@
     opacity: 1;
   }
 
-  .user-botton {
+  .botton-icon.user {
     background-image: url('./images/user.svg');
   }
 
-  .setting-botton {
+  .botton-icon.setting {
     background-image: url('./images/setting.svg');
   }
 
-  .command-botton {
+  .botton-icon.command {
     background-image: url('./images/command.svg');
   }
 
-  .close-botton {
+  .botton-icon.close {
+    --close-icon-size: 1.5em;
+    display: inline-block;
+    background-size: var(--close-icon-size);
+    height: var(--close-icon-size);
+    width: var(--close-icon-size);
     background-image: url('./images/close.svg');
   }
+
   .curtain {
     display: none;
     position: absolute;
@@ -90,11 +81,11 @@
     width: 100%;
     z-index: 10;
   }
+
   .control-wrapper {
-    display: none;
+    /* display: none; */
     z-index: 20;
     position: fixed;
-    height: 300px;
     bottom: 0;
     left: 0;
     right: 0;
@@ -109,14 +100,43 @@
 
   .cw-header {
     display: flex;
-    align-items: center;
+    height: 24px;
     justify-content: space-between;
-    height: 2em;
   }
 
-  .cw-section-title {
-    font-weight: bold;
-    font-size: 1.25em;
+  .cw-footer {
+    /* height: 3em; */
+    border-top: 1px solid var(--border-color);
+    padding: 6px var(--center-padding) 2px;
+  }
+
+  .cw-icon-list {
+    margin: 0 auto;
+    padding: 0;
+    display: flex;
+    max-width: 1080px;
+    min-width: 320px;
+    flex-flow: row nowrap;
+    list-style: none;
+    justify-content: space-around;
+  }
+
+  .cw-list-item {
+    flex-grow: 1;
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+    cursor: pointer;
+    opacity: 0.4;
+  }
+
+  .cw-list-item.active {
+    opacity: 1;
+  }
+
+  .cw-list-item .botton-text {
+    font-size: 12px;
+    margin-top: 3px;
   }
   </style>
 </head>
@@ -125,23 +145,7 @@
   <header class="global-header bg-blur">
     <div class="gh-wrapper center-frame">
       <div class="gh-left">Rubik's Cube</div>
-      <div class="gh-right">
-        <ul class="gh-icon-list">
-          <li>
-            <a href="#" class="user-botton botton-icon"></a>
-          </li>
-          <!--
-           -->
-          <li>
-            <a href="#" class="setting-botton botton-icon"></a>
-          </li>
-          <!--
-           -->
-          <li>
-            <a href="#" class="command-botton botton-icon"></a>
-          </li>
-        </ul>
-      </div>
+      <div class="gh-right"></div>
     </div>
   </header>
   <div class="canvas-wrapper">
@@ -151,16 +155,14 @@
   <div class="control-wrapper bg-blur">
     <div class="cw-inner center-frame">
       <header class="cw-header">
-        <div class="cw-left">
-          <h2 class="cw-section-title">User</h2>
-        </div>
+        <div class="cw-left"></div>
         <div class="cw-right">
-          <a class="close-botton botton-icon" href="#"></a>
+          <span class="close botton-icon"></span>
         </div>
       </header>
       <div class="cw-sections">
         <div class="user-section">
-          <ul>
+          <ul style="margin:0; padding:0; list-style:none;">
             <li><span>Kravis Lau</span></li>
             <li>History</li>
             <li><a href="#">Change Password</a></li>
@@ -171,14 +173,23 @@
         <div class="setting-section"></div>
         <div class="command-section"></div>
       </div>
-      <footer class="cw-footer">
-        <ul>
-          <li>。</li>
-          <li>。</li>
-          <li>。</li>
-        </ul>
-      </footer>
     </div>
+    <footer class="cw-footer">
+      <ul class="cw-icon-list">
+        <li class="cw-list-item user active">
+          <span class="user botton-icon"></span>
+          <spna class="user botton-text">User</spna>
+        </li>
+        <li class="cw-list-item command">
+          <span class="command botton-icon"></span>
+          <spna class="command botton-text">Command</spna>
+        </li>
+        <li class="cw-list-item setting">
+          <span class="setting botton-icon"></span>
+          <spna class="setting botton-text">Setting</spna>
+        </li>
+      </ul>
+    </footer>
   </div>
   <script type="text/javascript" src="./scripts/lib/three.min.js"></script>
   <script type="text/javascript" src="./scripts/lib/Tween.min.js"></script>
