@@ -12,7 +12,7 @@
 'use strict';
 
 /* Global Values */
-const faceRatio = 2;
+const faceRatio = 0.25;
 
 let canvasHeight = 0;
 let canvasWidth = 0;
@@ -31,6 +31,14 @@ let rightArray = [];
 let downArray = [];
 let leftArray = [];
 let backArray = [];
+
+let upFacelet;
+let frontFacelet;
+let rightFacelet;
+let downFacelet;
+let leftFacelet;
+let backFacelet;
+let nullFacelet;
 
 let rotationTaskList = [];
 let rotationTaskCache = [];
@@ -135,10 +143,10 @@ function enableScroll() {
 }
 
 /* Stats Function */
-const stats = new Stats();
-(() => {
-  document.body.appendChild(stats.domElement);
-})();
+// const stats = new Stats();
+// (() => {
+//   document.body.appendChild(stats.domElement);
+// })();
 
 /* Cube Operation */
 function changePivot(x, y, z, obj) {
@@ -209,7 +217,7 @@ function initCamera() {
   scene.add(camera);
 }
 
-function getFace(faceCode) {
+function createFaceTextureCanvas(faceCode) {
   let color = 'rgb(0, 0, 0)';
   switch (faceCode) {
     case 'U':
@@ -268,6 +276,16 @@ function getFace(faceCode) {
   return canvas;
 }
 
+function createFaces() {
+  upFacelet = createFaceTextureCanvas('U');
+  frontFacelet = createFaceTextureCanvas('F');
+  rightFacelet = createFaceTextureCanvas('R');
+  downFacelet = createFaceTextureCanvas('D');
+  leftFacelet = createFaceTextureCanvas('L');
+  backFacelet = createFaceTextureCanvas('B');
+  nullFacelet = createFaceTextureCanvas('N');
+}
+
 function formatName(str) {
   const codeArray = [];
   const codeObj = {
@@ -300,40 +318,40 @@ function createCubes() {
         const myFaces = [];
         if (y === 5) {
           cubeName += 'U';
-          myFaces[2] = getFace('U');
-          myFaces[3] = getFace('N');
+          myFaces[2] = upFacelet;
+          myFaces[3] = nullFacelet;
         }
         if (x === 1) {
           cubeName += 'L';
-          myFaces[1] = getFace('L');
-          myFaces[0] = getFace('N');
+          myFaces[1] = leftFacelet;
+          myFaces[0] = nullFacelet;
         }
         if (z === 5) {
           cubeName += 'F';
-          myFaces[4] = getFace('F');
-          myFaces[3] = getFace('N');
+          myFaces[4] = frontFacelet;
+          myFaces[3] = nullFacelet;
         }
         if (x === 5) {
           cubeName += 'R';
-          myFaces[0] = getFace('R');
-          myFaces[1] = getFace('N');
+          myFaces[0] = rightFacelet;
+          myFaces[1] = nullFacelet;
         }
         if (y === 1) {
           cubeName += 'D';
-          myFaces[3] = getFace('D');
-          myFaces[2] = getFace('N');
+          myFaces[3] = downFacelet;
+          myFaces[2] = nullFacelet;
         }
         if (z === 1) {
           cubeName += 'B';
-          myFaces[5] = getFace('B');
-          myFaces[4] = getFace('N');
+          myFaces[5] = backFacelet;
+          myFaces[4] = nullFacelet;
         }
 
         // Create MultiMaterial
         const materials = [];
         for (let i = 0; i < 6; i += 1) {
           const texture = (myFaces[i] === undefined) ?
-            new THREE.Texture(getFace('N')) : new THREE.Texture(myFaces[i]);
+            new THREE.Texture(nullFacelet) : new THREE.Texture(myFaces[i]);
           texture.needsUpdate = true;
           materials.push(new THREE.MeshBasicMaterial({
             map: texture,
@@ -351,7 +369,7 @@ function createCubes() {
   }
 }
 
-function createFacelets() {
+function createFaceletArrays() {
   for (let i = 0; i <= 8; i += 1) {
     leftArray.push(allCubes[i]);
   }
@@ -389,10 +407,12 @@ function createFacelets() {
 
 function initObject() {
   mesh = new THREE.Object3D();
+  // Create 7 facelet texture
+  createFaces();
   // Create 27 cubes
   createCubes();
   // Create 6 facelets
-  createFacelets();
+  createFaceletArrays();
 
   theCube = changePivot(3, 3, 3, mesh);
   scene.add(theCube);
@@ -845,7 +865,7 @@ function executeCommands(str) {
 }
 
 function loop() {
-  stats.begin();
+  // stats.begin();
   loopID = requestAnimationFrame(loop);
   if (rotationTaskList.length > 0 && !isRotating) {
     executeRotation();
@@ -857,7 +877,7 @@ function loop() {
   TWEEN.update();
   controls.update();
   renderer.render(scene, camera);
-  stats.end();
+  // stats.end();
 }
 
 function cancelLoop() {

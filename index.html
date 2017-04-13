@@ -9,16 +9,18 @@
   <style type="text/css">
   body {
     --center-padding: 1.5em;
+    --border-color: #B3B2B3;
   }
 
   .global-header {
     position: fixed;
     width: 100%;
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid var(--border-color);
   }
 
   .bg-blur {
     background-color: rgba(255, 255, 255, .8);
+    -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
   }
 
@@ -79,14 +81,24 @@
   .close-botton {
     background-image: url('./images/close.svg');
   }
-
+  .curtain {
+    display: none;
+    position: absolute;
+    top: 0;
+    background: rgba(0, 0, 0, 0.6);
+    height: 100%;
+    width: 100%;
+    z-index: 10;
+  }
   .control-wrapper {
+    display: none;
+    z-index: 20;
     position: fixed;
     height: 300px;
     bottom: 0;
     left: 0;
     right: 0;
-    border-top: 1px solid #ccc;
+    border-top: 1px solid var(--border-color);
   }
 
   .cw-inner {
@@ -135,6 +147,7 @@
   <div class="canvas-wrapper">
     <canvas class="main-canvas"></canvas>
   </div>
+  <div class="curtain"></div>
   <div class="control-wrapper bg-blur">
     <div class="cw-inner center-frame">
       <header class="cw-header">
