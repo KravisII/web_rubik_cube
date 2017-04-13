@@ -11,12 +11,13 @@
     font-family: 'Myriad Set Pro', -apple-system, -apple-system-font, 'Helvetica Neue', Arial, 'PingFang SC', 'Hiragino Sans GB', STHeiti, 'Microsoft YaHei', 'Microsoft JhengHei', 'Source Han Sans SC', 'Noto Sans CJK SC', 'Source Han Sans CN', 'Noto Sans SC', 'Source Han Sans TC', 'Noto Sans CJK TC', 'WenQuanYi Micro Hei', SimSun, sans-serif;
     --center-padding: 1.5em;
     --border-color: #B3B2B3;
+    --ios-border-width: 0.5px;
   }
 
   .global-header {
     position: fixed;
     width: 100%;
-    border-bottom: .5px solid var(--border-color);
+    border-bottom: var(--ios-border-width) solid var(--border-color);
   }
 
   .bg-blur {
@@ -89,7 +90,7 @@
     bottom: 0;
     left: 0;
     right: 0;
-    border-top: 1px solid var(--border-color);
+    border-top: var(--ios-border-width) solid var(--border-color);
   }
 
   .cw-inner {
@@ -106,7 +107,7 @@
 
   .cw-footer {
     /* height: 3em; */
-    border-top: 1px solid var(--border-color);
+    border-top: var(--ios-border-width) solid var(--border-color);
     padding: 6px var(--center-padding) 2px;
   }
 
