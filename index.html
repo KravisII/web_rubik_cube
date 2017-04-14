@@ -3,20 +3,23 @@
 
 <head>
   <meta charset='utf-8'>
-  <meta name="viewport" content="initial-scale=1.0,maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" id="viewport">
   <title>Web Rubik's Cube</title>
   <link rel="stylesheet" type="text/css" href="./styles/home.css">
   <style type="text/css">
   body {
     font-family: 'Myriad Set Pro', -apple-system, -apple-system-font, 'Helvetica Neue', Arial, 'PingFang SC', 'Hiragino Sans GB', STHeiti, 'Microsoft YaHei', 'Microsoft JhengHei', 'Source Han Sans SC', 'Noto Sans CJK SC', 'Source Han Sans CN', 'Noto Sans SC', 'Source Han Sans TC', 'Noto Sans CJK TC', 'WenQuanYi Micro Hei', SimSun, sans-serif;
+    user-select: none;
     --center-padding: 1.5em;
     --border-color: #B3B2B3;
     --ios-border-width: 0.5px;
     --tab-height: 3em;
   }
+
   .disable {
     display: none;
   }
+
   .center-frame {
     max-width: 1080px;
     min-width: 320px;
@@ -50,6 +53,7 @@
     align-items: center;
     justify-content: space-between;
     height: 100%;
+    cursor: default;
   }
 
   .canvas-wrapper {
@@ -65,7 +69,7 @@
 
   .gh-left {}
 
-  .botton-icon {
+  .button-icon {
     height: 1.25em;
     width: 1.25em;
     background-size: 1.25em;
@@ -74,19 +78,19 @@
     opacity: 1;
   }
 
-  .botton-icon.user {
+  .button-icon.user {
     background-image: url('./images/user.svg');
   }
 
-  .botton-icon.setting {
+  .button-icon.setting {
     background-image: url('./images/setting.svg');
   }
 
-  .botton-icon.command {
+  .button-icon.command {
     background-image: url('./images/command.svg');
   }
 
-  .botton-icon.close {
+  .button-icon.close {
     --close-icon-size: 1.5em;
     display: inline-block;
     background-size: var(--close-icon-size);
@@ -161,9 +165,18 @@
     opacity: 1;
   }
 
-  .gf-list-item .botton-text {
+  .cw-sections > div {
+    display: none;
+  }
+
+  .cw-sections > div.active {
+    display: block;
+  }
+
+  .gf-list-item .button-text {
     font-size: 12px;
     margin-top: 3px;
+    cursor: default;
   }
   </style>
 </head>
@@ -184,7 +197,7 @@
       <header class="cw-header">
         <div class="cw-left"></div>
         <div class="cw-right">
-          <span class="close botton-icon"></span>
+          <span class="close button-icon"></span>
         </div>
       </header>
       <div class="cw-sections">
@@ -197,8 +210,18 @@
             <li><a href="#">Sign In / Sign Up</a></li>
           </ul>
         </div>
-        <div class="setting-section"></div>
-        <div class="command-section"></div>
+        <div class="command-section">
+          <textarea></textarea>
+          <button>execute</button>
+          <button>reverse</button>
+        </div>
+        <div class="setting-section">
+          <ul>
+            <li>Duration</li>
+            <li>TEMP</li>
+            <li>TEMP</li>
+          </ul>
+        </div>
       </div>
     </div>
   </div>
@@ -206,16 +229,16 @@
     <div class="gf-wrapper center-frame">
       <ul class="gf-icon-list">
         <li class="gf-list-item user">
-          <span class="user botton-icon"></span>
-          <spna class="user botton-text">User</spna>
+          <span class="user button-icon"></span>
+          <spna class="user button-text">User</spna>
         </li>
         <li class="gf-list-item command">
-          <span class="command botton-icon"></span>
-          <spna class="command botton-text">Command</spna>
+          <span class="command button-icon"></span>
+          <spna class="command button-text">Command</spna>
         </li>
         <li class="gf-list-item setting">
-          <span class="setting botton-icon"></span>
-          <spna class="setting botton-text">Setting</spna>
+          <span class="setting button-icon"></span>
+          <spna class="setting button-text">Setting</spna>
         </li>
       </ul>
     </div>

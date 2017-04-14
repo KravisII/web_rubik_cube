@@ -1,12 +1,13 @@
 /* global document */
 
 const curtain = document.querySelector('.curtain');
-const closeBotton = document.querySelector('.close.botton-icon');
-const userBotton = document.querySelector('.user.gf-list-item');
-const commandBotton = document.querySelector('.command.gf-list-item');
-const settingBotton = document.querySelector('.setting.gf-list-item');
+const closeButton = document.querySelector('.close.button-icon');
+const userButton = document.querySelector('.user.gf-list-item');
+const commandButton = document.querySelector('.command.gf-list-item');
+const settingButton = document.querySelector('.setting.gf-list-item');
 
 const controlWrapper = document.querySelector('.control-wrapper');
+const sections = document.querySelectorAll('.cw-sections > div');
 
 /**
  * 清除 .active 的 class
@@ -39,7 +40,22 @@ function openControl(element) {
   controlWrapper.classList.remove('disable');
   clearAvtiveElements();
   element.classList.add('active');
-  // TODO: 修改出现的 section
+
+  /* 重置所有 section */
+  for (let section of sections) {
+    section.classList.remove('active');
+  }
+
+  /* 显示特定的 section */
+  if (element.classList.contains('user')) {
+    sections[0].classList.add('active');
+  } else if (element.classList.contains('command')) {
+    sections[1].classList.add('active');
+  } else if (element.classList.contains('setting')) {
+    sections[2].classList.add('active');
+  } else {
+    throw new TypeError('Wrong element');
+  }
 }
 
 /**
@@ -52,10 +68,10 @@ function curtainOnClick(event) {
 }
 
 /**
- * closeBotton 按钮点击（触摸）事件
+ * closeButton 按钮点击（触摸）事件
  * @return undefined
  */
-function closeBottonClick(event) {
+function closeButtonClick(event) {
   if (event) {
     event.preventDefault();
   }
@@ -63,10 +79,10 @@ function closeBottonClick(event) {
   clearAvtiveElements();
 }
 
-function listBottonsClick(event) {
+function listButtonsClick(event) {
   event.preventDefault();
   if (this.classList.contains('active')) {
-    closeBottonClick();
+    closeButtonClick();
   } else {
     openControl(this);
   }
@@ -75,14 +91,14 @@ function listBottonsClick(event) {
 curtain.addEventListener('click', curtainOnClick, false);
 curtain.addEventListener('touchend', curtainOnClick, false);
 
-closeBotton.addEventListener('click', closeBottonClick, false);
-closeBotton.addEventListener('touchend', closeBottonClick, false);
+closeButton.addEventListener('click', closeButtonClick, false);
+closeButton.addEventListener('touchend', closeButtonClick, false);
 
-userBotton.addEventListener('click', listBottonsClick, false);
-userBotton.addEventListener('touchend', listBottonsClick, false);
+userButton.addEventListener('click', listButtonsClick, false);
+userButton.addEventListener('touchend', listButtonsClick, false);
 
-commandBotton.addEventListener('click', listBottonsClick, false);
-commandBotton.addEventListener('touchend', listBottonsClick, false);
+commandButton.addEventListener('click', listButtonsClick, false);
+commandButton.addEventListener('touchend', listButtonsClick, false);
 
-settingBotton.addEventListener('click', listBottonsClick, false);
-settingBotton.addEventListener('touchend', listBottonsClick, false);
+settingButton.addEventListener('click', listButtonsClick, false);
+settingButton.addEventListener('touchend', listButtonsClick, false);
