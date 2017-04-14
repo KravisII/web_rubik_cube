@@ -89,7 +89,7 @@ function listButtonsClick(event) {
 }
 
 curtain.addEventListener('click', curtainOnClick, false);
-curtain.addEventListener('touchend', curtainOnClick, false);
+curtain.addEventListener('touchstart', curtainOnClick, false);
 
 closeButton.addEventListener('click', closeButtonClick, false);
 closeButton.addEventListener('touchend', closeButtonClick, false);
