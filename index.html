@@ -10,16 +10,26 @@
   body {
     font-family: 'Myriad Set Pro', -apple-system, -apple-system-font, 'Helvetica Neue', Arial, 'PingFang SC', 'Hiragino Sans GB', STHeiti, 'Microsoft YaHei', 'Microsoft JhengHei', 'Source Han Sans SC', 'Noto Sans CJK SC', 'Source Han Sans CN', 'Noto Sans SC', 'Source Han Sans TC', 'Noto Sans CJK TC', 'WenQuanYi Micro Hei', SimSun, sans-serif;
     user-select: none;
+    font-synthesis: none;
+    -moz-font-feature-settings: 'kern';
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     --center-padding: 1.5em;
     --border-color: #B3B2B3;
     --ios-border-width: 0.5px;
+    --section-button-height: 2.75em;
     --tab-height: 3em;
   }
 
   ul {
-        margin: 0;
+    margin: 0;
     padding: 0;
     list-style: none;
+  }
+
+  a {
+    color: #3498db;
+    text-decoration: none;
   }
 
   .disable {
@@ -88,12 +98,16 @@
     background-image: url('./images/user.svg');
   }
 
-  .button-icon.setting {
-    background-image: url('./images/setting.svg');
-  }
-
   .button-icon.command {
     background-image: url('./images/command.svg');
+  }
+
+  .button-icon.history {
+    background-image: url('./images/history.svg');
+  }
+
+  .button-icon.setting {
+    background-image: url('./images/setting.svg');
   }
 
   .button-icon.close {
@@ -121,21 +135,21 @@
     border-top: var(--ios-border-width) solid var(--border-color);
   }
 
-  .cw-inner {
-    max-width: 1080px;
-    min-width: 320px;
-    padding: 1em var(--center-padding);
-  }
-
   .cw-header {
-    padding: 1em 0 0;
+    padding: 0.75em 0;
   }
 
-.cw-header-inner {
+  .cw-header-inner {
     display: flex;
     height: 24px;
     justify-content: space-between;
-}
+  }
+
+  .cw-inner {
+    max-width: 1080px;
+    min-width: 320px;
+    padding: 0 var(--center-padding) 1em;
+  }
 
   .global-footer {
     width: 100%;
@@ -175,18 +189,104 @@
     opacity: 1;
   }
 
-  .cw-sections > div {
+  .gf-list-item .button-text {
+    font-size: .75em;
+    margin-top: .1875em;
+    cursor: default;
+  }
+
+  .cw-sections > section {
     display: none;
   }
 
-  .cw-sections > div.active {
+  .cw-sections > section.active {
     display: block;
   }
 
-  .gf-list-item .button-text {
-    font-size: 12px;
-    margin-top: 3px;
-    cursor: default;
+  .section-button {
+    text-align: center;
+    width: 100%;
+    max-width: 380px;
+    margin: 0 auto;
+    height: var(--section-button-height);
+    line-height: var(--section-button-height);
+    color: #FFFFFF;
+    cursor: pointer;
+    border-radius: .5em;
+    font-weight: bolder;
+  }
+
+  .section-button.sign-in {
+    background: #3498db;
+  }
+
+  .section-button.sign-up {
+    background: #2ecc71;
+  }
+
+  .section-button.sign-out {
+    background: #ff3b30;
+  }
+
+  .user-section > div {
+    display: none;
+  }
+
+  .user-section > div.show {
+    display: initial;
+  }
+
+  .us-user-info {
+    text-align: center;
+  }
+
+  .usui-name {
+    font-weight: bold;
+    font-size: 1.5em;
+  }
+
+  .usui-email {
+    margin: .375em 0 .5em;
+    color: #333333;
+  }
+
+  .us-sign-in-inner,
+  .us-sign-up-inner {
+    max-width: 380px;
+    margin: 0 auto;
+  }
+
+  .us-sign-in-inner label,
+  .us-sign-in-inner input,
+  .us-sign-up-inner label,
+  .us-sign-up-inner input {
+    display: block;
+  }
+
+  .us-sign-in-inner label,
+  .us-sign-up-inner label {
+    font-weight: bold;
+    font-size: .875em;
+    margin-bottom: 6px;
+  }
+
+  .us-sign-in-inner input,
+  .us-sign-up-inner input {
+    margin-bottom: 16px;
+    width: 100%;
+    min-height: 44px;
+    line-height: 20px;
+    box-sizing: border-box;
+    border-radius: .5em;
+    padding: 6px 8px;
+    border: 1px solid #d1d5da;
+    box-shadow: rgba(27, 31, 35, 0.0745098) 0px 1px 2px 0px inset;
+  }
+
+  .us-sign-in-tip,
+  .us-sign-up-tip {
+    text-align: center;
+    margin: .5em 0 0;
   }
   </style>
 </head>
@@ -204,41 +304,73 @@
   <div class="curtain absolute-frame disable"></div>
   <div class="control-wrapper bg-blur absolute-frame disable">
     <header class="cw-header">
-    <div class="cw-header-inner center-frame">
-      <div class="cw-left"></div>
-      <div class="cw-right">
-        <span class="close button-icon"></span>
-      </div>
+      <div class="cw-header-inner center-frame">
+        <div class="cw-left"></div>
+        <div class="cw-right">
+          <span class="close button-icon"></span>
+        </div>
       </div>
     </header>
     <div class="cw-inner center-frame">
       <div class="cw-sections">
-        <div class="user-section">
-          <ul>
-            <li><span>Kravis Lau</span></li>
-            <li>History</li>
-            <li><a href="#">Change Password</a></li>
-            <li><a href="#">Logout</a></li>
-            <li><a href="#">Sign In / Sign Up</a></li>
-          </ul>
-        </div>
-        <div class="command-section">
+        <section class="user-section">
+          <div class="us-user-info">
+            <div class="usui-name">Nick Name</div>
+            <div class="usui-email">youremail@example.com</div>
+            <div class="section-button sign-out">Sign out</div>
+          </div>
+          <div class="us-sign-in show">
+            <form>
+              <div class="us-sign-in-inner">
+                <label for="sign-in-email">Email address</label>
+                <input type="text" name="email" id="sign-in-email">
+                <label for="sign-in-password">Password</label>
+                <input type="text" name="password" id="sign-in-password">
+                <div class="section-button sign-in">Sign in</div>
+                <!-- <input type="submit" name="commit" value="Sign In" class="section-button sign-in"> -->
+              </div>
+            </form>
+            <p class="us-sign-in-tip">
+              <a href="#">Create an account</a> to save history and setting.
+            </p>
+          </div>
+          <div class="us-sign-up">
+            <form>
+              <div class="us-sign-up-inner">
+                <label for="sign-up-email">Email address</label>
+                <input type="text" name="email" id="sign-up-email">
+                <label for="sign-up-nickname">Nick name</label>
+                <input type="text" name="email" id="sign-up-nickname">
+                <label for="sign-up-password">Password</label>
+                <input type="password" name="password" id="sign-up-password">
+                <div class="section-button sign-up">Sign up</div>
+              </div>
+            </form>
+            <p class="us-sign-up-tip">
+              Already have an account? <a href="#">Sign in.</a>
+            </p>
+          </div>
+        </section>
+        <section class="command-section">
           <textarea></textarea>
           <button>execute</button>
           <button>reverse</button>
-        </div>
-        <div class="setting-section">
+        </section>
+        <section class="history-section">
+          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Recusandae temporibus ut, qui obcaecati esse labore! Iure dignissimos perspiciatis error ut.</p>
+        </section>
+        <section class="setting-section">
           <ul>
             <li>Duration</li>
             <li>Theme: dark / light</li>
             <li>Delay</li>
             <li>Face Code</li>
+            <li>Change Language</li>
             <!-- TODO: 加入倒计时 -->
             <!-- TODO: 加入状态提示 -->
-            <!-- TODO: 调节底栏间距 -->
             <!-- TODO: （重要）加入手势操作魔方 -->
           </ul>
-        </div>
+        </section>
       </div>
     </div>
   </div>
@@ -252,6 +384,10 @@
         <li class="gf-list-item command">
           <span class="command button-icon"></span>
           <spna class="command button-text">Command</spna>
+        </li>
+        <li class="gf-list-item history">
+          <span class="history button-icon"></span>
+          <spna class="history button-text">History</spna>
         </li>
         <li class="gf-list-item setting">
           <span class="setting button-icon"></span>

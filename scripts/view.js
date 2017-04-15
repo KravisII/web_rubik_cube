@@ -1,13 +1,31 @@
 /* global document */
+/* eslint no-console: off, strict: off, no-underscore-dangle: off*/
+
+'use strict';
 
 const curtain = document.querySelector('.curtain');
 const closeButton = document.querySelector('.close.button-icon');
 const userButton = document.querySelector('.user.gf-list-item');
 const commandButton = document.querySelector('.command.gf-list-item');
+const historyButton = document.querySelector('.history.gf-list-item');
 const settingButton = document.querySelector('.setting.gf-list-item');
 
 const controlWrapper = document.querySelector('.control-wrapper');
-const sections = document.querySelectorAll('.cw-sections > div');
+const sections = document.querySelectorAll('.cw-sections > section');
+const userSection = document.querySelector('.cw-sections > .user-section');
+const commandSection = document.querySelector('.cw-sections > .command-section');
+const historySection = document.querySelector('.cw-sections > .history-section');
+const settingSection = document.querySelector('.cw-sections > .setting-section');
+
+/**
+ * 添加点击事件
+ * @param {HTMLElement} element 待添加的元素
+ * @param {function} func 待绑定的函数名
+ */
+function addTapEventFor(element, func) {
+  element.addEventListener('click', func, false);
+  element.addEventListener('touchstart', func, false);
+}
 
 /**
  * 清除 .active 的 class
@@ -15,7 +33,7 @@ const sections = document.querySelectorAll('.cw-sections > div');
  */
 function clearAvtiveElements() {
   const elements = document.querySelectorAll('.active');
-  for (let element of elements) {
+  for (const element of elements) {
     element.classList.remove('active');
   }
 }
@@ -42,17 +60,19 @@ function openControl(element) {
   element.classList.add('active');
 
   /* 重置所有 section */
-  for (let section of sections) {
+  for (const section of sections) {
     section.classList.remove('active');
   }
 
   /* 显示特定的 section */
   if (element.classList.contains('user')) {
-    sections[0].classList.add('active');
+    userSection.classList.add('active');
   } else if (element.classList.contains('command')) {
-    sections[1].classList.add('active');
+    commandSection.classList.add('active');
+  } else if (element.classList.contains('history')) {
+    historySection.classList.add('active');
   } else if (element.classList.contains('setting')) {
-    sections[2].classList.add('active');
+    settingSection.classList.add('active');
   } else {
     throw new TypeError('Wrong element');
   }
@@ -79,7 +99,11 @@ function closeButtonClick(event) {
   clearAvtiveElements();
 }
 
-function listButtonsClick(event) {
+/**
+ * tab 按钮的点击（触摸）事件
+ * @return undefined
+ */
+function tabButtonsClick(event) {
   event.preventDefault();
   if (this.classList.contains('active')) {
     closeButtonClick();
@@ -88,17 +112,16 @@ function listButtonsClick(event) {
   }
 }
 
-curtain.addEventListener('click', curtainOnClick, false);
-curtain.addEventListener('touchstart', curtainOnClick, false);
+/**
+ * 添加所有页面事件
+ */
+function addViewEvents() {
+  addTapEventFor(curtain, curtainOnClick);
+  addTapEventFor(closeButton, closeButtonClick);
+  const buttons = [userButton, commandButton, historyButton, settingButton];
+  for (const button of buttons) {
+    addTapEventFor(button, tabButtonsClick);
+  }
+}
 
-closeButton.addEventListener('click', closeButtonClick, false);
-closeButton.addEventListener('touchend', closeButtonClick, false);
-
-userButton.addEventListener('click', listButtonsClick, false);
-userButton.addEventListener('touchend', listButtonsClick, false);
-
-commandButton.addEventListener('click', listButtonsClick, false);
-commandButton.addEventListener('touchend', listButtonsClick, false);
-
-settingButton.addEventListener('click', listButtonsClick, false);
-settingButton.addEventListener('touchend', listButtonsClick, false);
+addViewEvents();
