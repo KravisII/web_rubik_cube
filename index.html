@@ -16,6 +16,12 @@
     --tab-height: 3em;
   }
 
+  ul {
+        margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
   .disable {
     display: none;
   }
@@ -122,10 +128,14 @@
   }
 
   .cw-header {
+    padding: 1em 0 0;
+  }
+
+.cw-header-inner {
     display: flex;
     height: 24px;
     justify-content: space-between;
-  }
+}
 
   .global-footer {
     width: 100%;
@@ -143,12 +153,9 @@
 
   .gf-icon-list {
     height: 100%;
-    margin: 0;
-    padding: 0;
     display: flex;
     flex-direction: row;
-    list-style: none;
-    align-items: center;
+    /* align-items: center; */
     justify-content: space-around;
   }
 
@@ -159,6 +166,9 @@
     align-items: center;
     opacity: 0.4;
     transition: opacity .3s ease-out;
+    height: 100%;
+    box-sizing: border-box;
+    padding: .5em 0 0;
   }
 
   .gf-list-item.active {
@@ -193,13 +203,15 @@
   </div>
   <div class="curtain absolute-frame disable"></div>
   <div class="control-wrapper bg-blur absolute-frame disable">
+    <header class="cw-header">
+    <div class="cw-header-inner center-frame">
+      <div class="cw-left"></div>
+      <div class="cw-right">
+        <span class="close button-icon"></span>
+      </div>
+      </div>
+    </header>
     <div class="cw-inner center-frame">
-      <header class="cw-header">
-        <div class="cw-left"></div>
-        <div class="cw-right">
-          <span class="close button-icon"></span>
-        </div>
-      </header>
       <div class="cw-sections">
         <div class="user-section">
           <ul>
@@ -223,6 +235,7 @@
             <li>Face Code</li>
             <!-- TODO: 加入倒计时 -->
             <!-- TODO: 加入状态提示 -->
+            <!-- TODO: 调节底栏间距 -->
             <!-- TODO: （重要）加入手势操作魔方 -->
           </ul>
         </div>
