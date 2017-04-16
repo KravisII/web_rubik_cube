@@ -33,6 +33,12 @@
     text-decoration: none;
   }
 
+  input:focus,
+  textarea {
+    -webkit-tap-highlight-color: none;
+    outline: none;
+  }
+
   .disable {
     display: none;
   }
@@ -151,7 +157,11 @@
   .cw-header-inner {
     display: flex;
     height: 24px;
-    justify-content: space-between;
+    justify-content: center;
+  }
+
+  .cw-header-inner .close {
+    width: 100%;
   }
 
   .cw-inner {
@@ -178,7 +188,6 @@
     height: 100%;
     display: flex;
     flex-direction: row;
-    /* align-items: center; */
     justify-content: space-around;
   }
 
@@ -225,11 +234,13 @@
     font-weight: bolder;
   }
 
-  .section-button.sign-in {
+  .section-button.sign-in,
+  .section-button.reverse {
     background: #3498db;
   }
 
-  .section-button.sign-up {
+  .section-button.sign-up,
+  .section-button.execute {
     background: #2ecc71;
   }
 
@@ -260,7 +271,9 @@
   }
 
   .us-sign-in-inner,
-  .us-sign-up-inner {
+  .us-sign-up-inner,
+  .cs-inner,
+  .ss-inner {
     max-width: 380px;
     margin: 0 auto;
   }
@@ -268,23 +281,24 @@
   .us-sign-in-inner label,
   .us-sign-in-inner input,
   .us-sign-up-inner label,
-  .us-sign-up-inner input {
+  .us-sign-up-inner input,
+  .cs-inner-label {
     display: block;
   }
 
   .us-sign-in-inner label,
-  .us-sign-up-inner label {
+  .us-sign-up-inner label,
+  .cs-inner-label {
     font-weight: bold;
     font-size: .875em;
     margin-bottom: 6px;
   }
 
-  .us-sign-in-inner input,
-  .us-sign-up-inner input {
-    margin-bottom: 16px;
+  .inpu-area {
+    margin-bottom: 1em;
     width: 100%;
     min-height: 44px;
-    line-height: 20px;
+    font-size: 16px;
     box-sizing: border-box;
     border-radius: .5em;
     padding: 6px 8px;
@@ -296,6 +310,170 @@
   .us-sign-up-tip {
     text-align: center;
     margin: .5em 0 0;
+  }
+
+  .cs-inner .section-button.execute {
+    margin-bottom: 1em;
+  }
+
+  .cs-inner textarea {
+    resize: none;
+    height: 6em;
+    font-family: monospace;
+  }
+
+  .setting-section {
+    --switch-height: 32px;
+    --switch-width: 72px;
+    --switch-background-color: #51B7FB;
+    --switch-border-color: #E4E4E4;
+    --switch-border-width: 1px;
+    --handle-size: 28px;
+    --handle-color: #FFFFFF;
+    --handle-border-color: tarnsparent;
+  }
+
+  .ss-group {
+    display: flex;
+    flex-flow: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .ss-group + .ss-group {
+    margin-top: 1em;
+  }
+
+  .ss-group.duration,
+  .ss-group.delay {
+    flex-flow: column;
+    align-items: initial;
+  }
+
+  .toolkit-label {
+    font-weight: bold;
+  }
+
+  #duration-value,
+  #delay-value {
+    font-weight: normal;
+  }
+
+  #duration-value::after {
+    content: "ms";
+  }
+
+  #delay-value::after {
+    content: "s";
+  }
+
+  .toolkit-label span {
+    display: block;
+  }
+
+  .ss-group.duration .toolkit-label,
+  .ss-group.delay .toolkit-label {
+    display: flex;
+    flex-flow: row;
+    justify-content: space-between;
+  }
+
+  .toolkit-slider {
+    margin-top: .5em;
+  }
+
+  .toolkit-switch {
+    position: relative;
+    height: var(--switch-height);
+    width: var(--switch-width);
+    background: var(--switch-background-color);
+    box-sizing: border-box;
+    border: var(--switch-border-width) solid var(--switch-border-color);
+    border-radius: var(--switch-height);
+    cursor: pointer;
+    will-change: background;
+    transition: background .2s;
+  }
+
+  .toolkit-switch-label {
+    position: absolute;
+    line-height: var(--switch-height);
+    font-size: 12px;
+    will-change: opacity;
+    transition: opacity .2s;
+  }
+
+  .toolkit-switch-label.on {
+    left: 10px;
+    color: #FFFFFF;
+  }
+
+  .toolkit-switch-label.off {
+    right: 10px;
+  }
+
+  .toolkit-switch[value="off"] .on {
+    opacity: 0;
+  }
+
+  .toolkit-switch[value="on"] .off {
+    opacity: 0;
+  }
+
+  .toolkit-switch[value="off"] {
+    background: #FFFFFF;
+  }
+
+  .toolkit-handle {
+    display: block;
+    height: var(--handle-size);
+    width: var(--handle-size);
+    border-radius: 50%;
+    border: 1px solid var(--handle-border-color);
+    position: relative;
+    top: 1px;
+    background: var(--handle-color);
+    box-shadow: 0 3px 5px 0 rgba(0, 0, 0, .2);
+    will-change: transform;
+    transition: transform .2s;
+    transform: translateX(calc(var(--switch-width) - var(--handle-size) - 3px));
+  }
+
+  .toolkit-switch[value="off"] .toolkit-handle {
+    transform: none;
+  }
+
+  input[type='range'] {
+    width: 100%;
+    max-width: 380px;
+    height: 32px;
+    cursor: pointer;
+    background: transparent;
+    margin-left: 0;
+    margin-right: 0;
+    margin-bottom: 0;
+  }
+
+  input[type='range'],
+  input[type='range']::-webkit-slider-runnable-track,
+  input[type='range']::-webkit-slider-thumb {
+    -webkit-appearance: none;
+  }
+
+  input[type='range']::-webkit-slider-runnable-track {
+    height: 1px;
+    background: #A6A6A6;
+  }
+
+  input[type='range']::-webkit-slider-thumb {
+    position: relative;
+    height: 28px;
+    width: 28px;
+    margin-top: -15px;
+    background: var(--handle-color);
+    box-shadow: 0 3px 5px 0 rgba(0, 0, 0, .2);
+    border-radius: 50%;
+    border: 1px solid rgba(0, 0, 0, .1);
   }
   </style>
 </head>
@@ -314,29 +492,25 @@
   <div class="control-wrapper bg-blur absolute-frame disable">
     <header class="cw-header">
       <div class="cw-header-inner center-frame">
-        <div class="cw-left"></div>
-        <div class="cw-right">
-          <span class="close button-icon"></span>
-        </div>
+        <span class="close button-icon"></span>
       </div>
     </header>
     <div class="cw-inner center-frame">
       <div class="cw-sections">
         <section class="user-section">
-          <div class="us-user-info">
+          <div class="us-user-info show">
             <div class="usui-name">Nick Name</div>
             <div class="usui-email">youremail@example.com</div>
             <div class="section-button sign-out">Sign out</div>
           </div>
-          <div class="us-sign-in show">
+          <div class="us-sign-in">
             <form>
               <div class="us-sign-in-inner">
                 <label for="sign-in-email">Email address</label>
-                <input type="text" name="email" id="sign-in-email">
+                <input type="text" name="email" id="sign-in-email" class="inpu-area">
                 <label for="sign-in-password">Password</label>
-                <input type="text" name="password" id="sign-in-password">
+                <input type="password" name="password" id="sign-in-password" class="inpu-area">
                 <div class="section-button sign-in">Sign in</div>
-                <!-- <input type="submit" name="commit" value="Sign In" class="section-button sign-in"> -->
               </div>
             </form>
             <p class="us-sign-in-tip">
@@ -347,11 +521,11 @@
             <form>
               <div class="us-sign-up-inner">
                 <label for="sign-up-email">Email address</label>
-                <input type="text" name="email" id="sign-up-email">
+                <input type="text" name="email" id="sign-up-email" class="inpu-area">
                 <label for="sign-up-nickname">Nick name</label>
-                <input type="text" name="email" id="sign-up-nickname">
+                <input type="text" name="email" id="sign-up-nickname" class="inpu-area">
                 <label for="sign-up-password">Password</label>
-                <input type="password" name="password" id="sign-up-password">
+                <input type="password" name="password" id="sign-up-password" class="inpu-area">
                 <div class="section-button sign-up">Sign up</div>
               </div>
             </form>
@@ -361,24 +535,57 @@
           </div>
         </section>
         <section class="command-section">
-          <textarea></textarea>
-          <button>execute</button>
-          <button>reverse</button>
+          <div class="cs-inner">
+            <span class="cs-inner-label">Commands</span>
+            <textarea class="inpu-area"></textarea>
+            <div class="section-button execute">Execute</div>
+            <div class="section-button reverse">Reverse</div>
+          </div>
         </section>
         <section class="history-section">
-          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Recusandae temporibus ut, qui obcaecati esse labore! Iure dignissimos perspiciatis error ut.</p>
+          <p>This is history-section. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Recusandae temporibus ut.</p>
         </section>
         <section class="setting-section">
-          <ul>
-            <li>Duration</li>
-            <li>Theme: dark / light</li>
-            <li>Delay</li>
-            <li>Face Code</li>
-            <li>Change Language</li>
-            <!-- TODO: 加入倒计时 -->
-            <!-- TODO: 加入状态提示 -->
-            <!-- TODO: （重要）加入手势操作魔方 -->
-          </ul>
+          <div class="ss-inner">
+            <div class="ss-group theme">
+              <div class="toolkit-label">Theme</div>
+              <div class="toolkit-switch" value="off" id="theme-switch">
+                <span class="toolkit-switch-label on">Dark</span>
+                <span class="toolkit-switch-label off">Light</span>
+                <span class="toolkit-handle"></span>
+              </div>
+            </div>
+            <div class="ss-group facecode">
+              <div class="toolkit-label">Facecode</div>
+              <div class="toolkit-switch" value="on" id="facecode-switch">
+                <span class="toolkit-switch-label on">Show</span>
+                <span class="toolkit-switch-label off">Hide</span>
+                <span class="toolkit-handle"></span>
+              </div>
+            </div>
+            <div class="ss-group language">
+              <div class="toolkit-label">Language</div>
+              <div class="toolkit-switch" value="off" id="language-switch">
+                <span class="toolkit-switch-label on">中</span>
+                <span class="toolkit-switch-label off">Eng</span>
+                <span class="toolkit-handle"></span>
+              </div>
+            </div>
+            <div class="ss-group duration">
+              <div class="toolkit-label">
+                <span>Duration</span>
+                <span id="duration-value">300</span>
+              </div>
+              <input type="range" class="toolkit-slider" id="duration-slider" min="200" max="3000" step="1" value="300">
+            </div>
+            <div class="ss-group delay">
+              <div class="toolkit-label">
+                <span>Delay</span>
+                <span id="delay-value">6</span>
+              </div>
+              <input type="range" class="toolkit-slider" id="delay-slider" min="1" max="10" step="1" value="6">
+            </div>
+          </div>
         </section>
       </div>
     </div>

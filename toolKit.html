@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+</head>
+
+<body>
+  <style type="text/css">
+  body {
+    --switch-height: 32px;
+    --switch-width: 72px;
+    --switch-background-color: #51B7FB;
+    --switch-border-color: #E4E4E4;
+    --switch-border-width: 1px;
+    --handle-size: 28px;
+    --handle-color: #FFFFFF;
+    --handle-border-color: tarnsparent;
+  }
+
+  .toolkit-switch {
+    position: relative;
+    height: var(--switch-height);
+    width: var(--switch-width);
+    background: var(--switch-background-color);
+    box-sizing: border-box;
+    border: var(--switch-border-width) solid var(--switch-border-color);
+    border-radius: var(--switch-height);
+    cursor: pointer;
+    will-change: background;
+    transition: background .2s;
+  }
+
+  .toolkit-switch-label {
+    position: absolute;
+    line-height: var(--switch-height);
+    font-size: 12px;
+    will-change: opacity;
+    transition: opacity .2s;
+  }
+
+  .toolkit-switch-label.on {
+    left: 10px;
+    color: #FFFFFF;
+  }
+
+  .toolkit-switch-label.off {
+    right: 10px;
+  }
+
+  .toolkit-switch[value="off"] .on {
+    opacity: 0;
+  }
+
+  .toolkit-switch[value="on"] .off {
+    opacity: 0;
+  }
+
+  .toolkit-switch[value="off"] {
+    background: #FFFFFF;
+  }
+
+  .toolkit-handle {
+    display: block;
+    height: var(--handle-size);
+    width: var(--handle-size);
+    border-radius: 50%;
+    border: 1px solid var(--handle-border-color);
+    position: relative;
+    top: 1px;
+    background: var(--handle-color);
+    box-shadow: 0 3px 5px 0 rgba(0, 0, 0, .2);
+    will-change: transform;
+    transition: transform .2s;
+    transform: translateX(calc(var(--switch-width) - var(--handle-size) - 3px));
+  }
+
+  .toolkit-switch[value="off"] .toolkit-handle {
+    transform: none;
+  }
+
+  input[type='range'] {
+    width: 100%;
+    max-width: 380px;
+    height: 32px;
+    /* overflow: hidden; */
+    cursor: pointer;
+  }
+
+  input[type='range'],
+  input[type='range']::-webkit-slider-runnable-track,
+  input[type='range']::-webkit-slider-thumb {
+    -webkit-appearance: none;
+  }
+
+  input[type='range']::-webkit-slider-runnable-track {
+    height: 1px;
+    background: #A6A6A6;
+  }
+
+  input[type='range']::-webkit-slider-thumb {
+    position: relative;
+    height: 28px;
+    width: 28px;
+    margin-top: -15px;
+    background: var(--handle-color);
+    box-shadow: 0 3px 5px 0 rgba(0, 0, 0, .2);
+    border-radius: 50%;
+    border: 1px solid rgba(0, 0, 0, .1);
+  }
+  </style>
+  <h2>toolkit-switch</h2>
+  <div class="toolkit-switch" value="on" id="switch-01">
+    <span class="toolkit-switch-label on">中</span>
+    <span class="toolkit-switch-label off">Eng</span>
+    <span class="toolkit-handle"></span>
+  </div>
+  <br>
+  <div class="toolkit-switch" value="off" id="switch-02">
+    <span class="toolkit-handle"></span>
+  </div>
+  <script type="text/javascript">
+  const switchArray = document.querySelectorAll('.toolkit-switch');
+
+  function toggleSwitch(event) {
+    const newValue = this.getAttribute('value') === 'on' ? 'off' : 'on';
+    this.setAttribute('value', newValue);
+  }
+
+  for (const switchKit of switchArray) {
+    switchKit.addEventListener('click', toggleSwitch, false);
+  }
+  </script>
+  <h2>toolkit-slider</h2>
+  <input type="range" class="toolkit-slider" min="1" max="10" step="1" value="2">
+</body>
+
+</html>

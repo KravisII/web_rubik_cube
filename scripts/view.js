@@ -23,8 +23,13 @@ const settingSection = document.querySelector('.cw-sections > .setting-section')
  * @param {function} func 待绑定的函数名
  */
 function addTapEventFor(element, func) {
-  element.addEventListener('click', func, false);
-  element.addEventListener('touchstart', func, false);
+  if (element.classList.contains('curtain')) {
+    element.addEventListener('mousedown', func, false);
+    element.addEventListener('touchstart', func, true);
+  } else {
+    element.addEventListener('mouseup', func, false);
+    element.addEventListener('touchend', func, false);
+  }
 }
 
 /**
@@ -125,3 +130,30 @@ function addViewEvents() {
 }
 
 addViewEvents();
+
+/* --------------- Switch functions --------------- */
+const switchArray = document.querySelectorAll('.toolkit-switch');
+
+function toggleSwitch(event) {
+  const newValue = this.getAttribute('value') === 'on' ? 'off' : 'on';
+  this.setAttribute('value', newValue);
+}
+
+for (const switchKit of switchArray) {
+  switchKit.addEventListener('click', toggleSwitch, false);
+}
+
+/* --------------- Slider functions --------------- */
+const durationSlider = document.querySelector('#duration-slider');
+const delaySlider = document.querySelector('#delay-slider');
+
+const durationValueSpan = document.querySelector('#duration-value');
+const delayValueSpan = document.querySelector('#delay-value');
+
+durationSlider.addEventListener('input', function (event) {
+  durationValueSpan.innerText = this.value;
+}, false);
+
+delaySlider.addEventListener('input', function (event) {
+  delayValueSpan.innerText = this.value;
+}, false);
