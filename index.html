@@ -319,18 +319,19 @@
   .cs-inner textarea {
     resize: none;
     height: 6em;
-    font-family: monospace;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
   }
 
   .setting-section {
     --switch-height: 32px;
-    --switch-width: 72px;
+    --switch-width: 80px;
     --switch-background-color: #51B7FB;
     --switch-border-color: #E4E4E4;
     --switch-border-width: 1px;
     --handle-size: 28px;
     --handle-color: #FFFFFF;
     --handle-border-color: tarnsparent;
+    --switch-time-func: ease;
   }
 
   .ss-group {
@@ -392,7 +393,7 @@
     border-radius: var(--switch-height);
     cursor: pointer;
     will-change: background;
-    transition: background .2s;
+    transition: background .2s var(--switch-time-func);
   }
 
   .toolkit-switch-label {
@@ -400,16 +401,16 @@
     line-height: var(--switch-height);
     font-size: 12px;
     will-change: opacity;
-    transition: opacity .2s;
+    transition: opacity .2s var(--switch-time-func);
   }
 
   .toolkit-switch-label.on {
-    left: 10px;
+    left: 12px;
     color: #FFFFFF;
   }
 
   .toolkit-switch-label.off {
-    right: 10px;
+    right: 12px;
   }
 
   .toolkit-switch[value="off"] .on {
@@ -435,7 +436,7 @@
     background: var(--handle-color);
     box-shadow: 0 3px 5px 0 rgba(0, 0, 0, .2);
     will-change: transform;
-    transition: transform .2s;
+    transition: transform .2s var(--switch-time-func);
     transform: translateX(calc(var(--switch-width) - var(--handle-size) - 3px));
   }
 
@@ -576,7 +577,7 @@
                 <span>Duration</span>
                 <span id="duration-value">300</span>
               </div>
-              <input type="range" class="toolkit-slider" id="duration-slider" min="200" max="3000" step="1" value="300">
+              <input type="range" class="toolkit-slider" id="duration-slider" min="300" max="3000" step="100" value="300">
             </div>
             <div class="ss-group delay">
               <div class="toolkit-label">
