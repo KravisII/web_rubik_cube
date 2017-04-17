@@ -22,6 +22,11 @@
     --tab-height: 3em;
   }
 
+  body.dark {
+    background: #000000;
+    --border-color: #4C4D4C;
+  }
+
   ul {
     margin: 0;
     padding: 0;
@@ -65,16 +70,23 @@
   }
 
   .bg-blur {
-    background-color: rgba(255, 255, 255, 1);
+    background: rgba(255, 255, 255, 1);
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
   }
 
+  .dark .bg-blur {
+    background: rgba(0, 0, 0, 1);
+  }
+
   @supports ((backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px))) {
     .bg-blur {
-      background-color: rgba(255, 255, 255, .8);
+      background: rgba(255, 255, 255, .8);
       -webkit-backdrop-filter: blur(10px);
       backdrop-filter: blur(10px);
+    }
+    .dark .bg-blur {
+      background: rgba(0, 0, 0, .8);
     }
   }
 
@@ -85,6 +97,10 @@
     justify-content: space-between;
     height: 100%;
     cursor: default;
+  }
+
+  .dark .gh-wrapper {
+    color: #FFFFFF;
   }
 
   .canvas-wrapper {
@@ -98,7 +114,9 @@
     padding: 0;
   }
 
-  .gh-left {}
+  .gh-left {
+    /* color: inherit; */
+  }
 
   .button-icon {
     height: 1.25em;
@@ -125,6 +143,22 @@
     background-image: url('./images/setting.svg');
   }
 
+  .dark .button-icon.user {
+    background-image: url('./images/user-dark.svg');
+  }
+
+  .dark .button-icon.command {
+    background-image: url('./images/command-dark.svg');
+  }
+
+  .dark .button-icon.history {
+    background-image: url('./images/history-dark.svg');
+  }
+
+  .dark .button-icon.setting {
+    background-image: url('./images/setting-dark.svg');
+  }
+
   .button-icon.close {
     --close-icon-size: 1.5em;
     display: inline-block;
@@ -132,6 +166,10 @@
     height: var(--close-icon-size);
     width: var(--close-icon-size);
     background-image: url('./images/close.svg');
+  }
+
+  .dark .button-icon.close {
+    background-image: url('./images/close-dark.svg');
   }
 
   .curtain {
@@ -148,6 +186,10 @@
     left: 0;
     right: 0;
     border-top: var(--ios-border-width) solid var(--border-color);
+  }
+
+  .dark .control-wrapper {
+    color: #FFFFFF;
   }
 
   .cw-header {
@@ -213,6 +255,10 @@
     cursor: default;
   }
 
+  .dark .button-text {
+    color: #FFFFFF;
+  }
+
   .cw-sections > section {
     display: none;
   }
@@ -240,7 +286,8 @@
   }
 
   .section-button.sign-up,
-  .section-button.execute {
+  .section-button.execute,
+  .section-button.random {
     background: #2ecc71;
   }
 
@@ -268,6 +315,10 @@
   .usui-email {
     margin: .375em 0 .5em;
     color: #333333;
+  }
+
+  .dark .usui-email {
+    color: #CCCCCC;
   }
 
   .us-sign-in-inner,
@@ -306,13 +357,19 @@
     box-shadow: rgba(27, 31, 35, 0.0745098) 0px 1px 2px 0px inset;
   }
 
+  .dark .inpu-area {
+    background: #000000;
+    color: #FFFFFF;
+  }
+
   .us-sign-in-tip,
   .us-sign-up-tip {
     text-align: center;
     margin: .5em 0 0;
   }
 
-  .cs-inner .section-button.execute {
+  .section-button.random,
+  .section-button.execute {
     margin-bottom: 1em;
   }
 
@@ -411,6 +468,7 @@
 
   .toolkit-switch-label.off {
     right: 12px;
+    color: #000000;
   }
 
   .toolkit-switch[value="off"] .on {
@@ -466,6 +524,10 @@
     background: #A6A6A6;
   }
 
+  .dark input[type='range']::-webkit-slider-runnable-track {
+    background: #595959;
+  }
+
   input[type='range']::-webkit-slider-thumb {
     position: relative;
     height: 28px;
@@ -475,6 +537,11 @@
     box-shadow: 0 3px 5px 0 rgba(0, 0, 0, .2);
     border-radius: 50%;
     border: 1px solid rgba(0, 0, 0, .1);
+  }
+
+  .dark input[type='range']::-webkit-slider-thumb {
+    box-shadow: 0 3px 5px 0 rgba(255, 255, 255, .4);
+    border: 1px solid rgba(255, 255, 255, .1);
   }
   </style>
 </head>
@@ -539,6 +606,7 @@
           <div class="cs-inner">
             <span class="cs-inner-label">Commands</span>
             <textarea class="inpu-area"></textarea>
+            <div class="section-button random">Generate random commands</div>
             <div class="section-button execute">Execute</div>
             <div class="section-button reverse">Reverse</div>
           </div>
@@ -575,16 +643,18 @@
             <div class="ss-group duration">
               <div class="toolkit-label">
                 <span>Duration</span>
-                <span id="duration-value">300</span>
+                <!-- TODO: Init -->
+                <span id="duration-value">undefined</span>
               </div>
-              <input type="range" class="toolkit-slider" id="duration-slider" min="300" max="3000" step="100" value="300">
+              <input type="range" class="toolkit-slider" id="duration-slider" min="300" max="3000" step="100" value="800">
             </div>
             <div class="ss-group delay">
               <div class="toolkit-label">
                 <span>Delay</span>
-                <span id="delay-value">6</span>
+                <!-- TODO: Init -->
+                <span id="delay-value">undefined</span>
               </div>
-              <input type="range" class="toolkit-slider" id="delay-slider" min="1" max="10" step="1" value="6">
+              <input type="range" class="toolkit-slider" id="delay-slider" min="1" max="10" step="1" value="3">
             </div>
           </div>
         </section>

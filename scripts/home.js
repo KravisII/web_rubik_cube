@@ -12,6 +12,16 @@
 'use strict';
 
 /* Global Values */
+const Cube = {};
+
+Object.defineProperty(Cube, 'duration', {
+  get: function() {
+    const durationSlider = document.querySelector('#duration-slider');
+    console.log(durationSlider.value);
+    return durationSlider.value;
+  },
+});
+
 const faceRatio = 0.25;
 
 let canvasHeight = 0;
@@ -48,8 +58,6 @@ let loopID;
 
 let isRotating = false;
 // let autoRotate = false;
-
-let duration = 2000;
 
 // const colors = [0xff3b30, 0xff9500, 0xffcc00, 0x4cd964, 0x5ac8fa, 0x007AFF, 0x5856D6, 0xFF2C55];
 
@@ -692,22 +700,22 @@ function executeRotation() {
 
   switch (facelet) {
     case 'U':
-      rotationTask.to({ y: -(direction * (Math.PI * 0.5)) }, duration);
+      rotationTask.to({ y: -(direction * (Math.PI * 0.5)) }, Cube.duration);
       break;
     case 'F':
-      rotationTask.to({ z: -(direction * (Math.PI * 0.5)) }, duration);
+      rotationTask.to({ z: -(direction * (Math.PI * 0.5)) }, Cube.duration);
       break;
     case 'R':
-      rotationTask.to({ x: -(direction * (Math.PI * 0.5)) }, duration);
+      rotationTask.to({ x: -(direction * (Math.PI * 0.5)) }, Cube.duration);
       break;
     case 'D':
-      rotationTask.to({ y: +(direction * (Math.PI * 0.5)) }, duration);
+      rotationTask.to({ y: +(direction * (Math.PI * 0.5)) }, Cube.duration);
       break;
     case 'L':
-      rotationTask.to({ x: +(direction * (Math.PI * 0.5)) }, duration);
+      rotationTask.to({ x: +(direction * (Math.PI * 0.5)) }, Cube.duration);
       break;
     case 'B':
-      rotationTask.to({ z: +(direction * (Math.PI * 0.5)) }, duration);
+      rotationTask.to({ z: +(direction * (Math.PI * 0.5)) }, Cube.duration);
       break;
     default:
       break;

@@ -1,8 +1,12 @@
-/* global document */
+/* global document randomCube executeCommands reverseCommands */
 /* eslint no-console: off, strict: off, no-underscore-dangle: off*/
 
 'use strict';
 
+/* Global value */
+// EMPTY NOW
+
+/* --------------- List item buttons --------------- */
 const curtain = document.querySelector('.curtain');
 const closeButton = document.querySelector('.close.button-icon');
 const userButton = document.querySelector('.user.gf-list-item');
@@ -131,7 +135,7 @@ function addViewEvents() {
 
 addViewEvents();
 
-/* --------------- Switch functions --------------- */
+/* --------------- Switch control --------------- */
 const switchArray = document.querySelectorAll('.toolkit-switch');
 
 function toggleSwitch(event) {
@@ -140,20 +144,71 @@ function toggleSwitch(event) {
 }
 
 for (const switchKit of switchArray) {
-  switchKit.addEventListener('click', toggleSwitch, false);
+  addTapEventFor(switchKit, toggleSwitch);
 }
 
-/* --------------- Slider functions --------------- */
+/* --------------- Slider(Setting) functions --------------- */
+const themeSwitch = document.querySelector('#theme-switch');
+
 const durationSlider = document.querySelector('#duration-slider');
 const delaySlider = document.querySelector('#delay-slider');
 
 const durationValueSpan = document.querySelector('#duration-value');
 const delayValueSpan = document.querySelector('#delay-value');
 
-durationSlider.addEventListener('input', function (event) {
+durationValueSpan.innerText = durationSlider.value;
+delayValueSpan.innerText = delaySlider.value;
+
+addTapEventFor(themeSwitch, () => {
+  const themeValue = themeSwitch.getAttribute('value');
+  if (themeValue === 'on') {
+    document.querySelector('body').classList.add('dark');
+  } else {
+    document.querySelector('body').classList.remove('dark');
+  }
+});
+
+durationSlider.addEventListener('input', function func() {
   durationValueSpan.innerText = this.value;
 }, false);
 
-delaySlider.addEventListener('input', function (event) {
+delaySlider.addEventListener('input', function func() {
   delayValueSpan.innerText = this.value;
 }, false);
+
+/* --------------- Command section --------------- */
+// TODO: 加入 iOS 的 return -> execute
+const textArea = document.querySelector('.cs-inner .inpu-area');
+
+const randomButton = document.querySelector('.section-button.random');
+const exectueButton = document.querySelector('.section-button.execute');
+const reverseButton = document.querySelector('.section-button.reverse');
+
+addTapEventFor(randomButton, () => {
+  textArea.value = randomCube(20);
+});
+
+// TODO: 合并下列代码
+addTapEventFor(exectueButton, () => {
+  // TODO: 检测合法性
+  const _command = textArea.value;
+  // TODO: 加入倒计时提示
+  const _delay = delaySlider.value * 1000;
+  setTimeout(() => {
+    executeCommands(_command);
+  }, _delay);
+  closeControl();
+});
+
+addTapEventFor(reverseButton, () => {
+  // TODO: 检测合法性
+  const _command = textArea.value;
+  // TODO: 加入倒计时提示
+  const _delay = delaySlider.value * 1000;
+  setTimeout(() => {
+    reverseCommands(_command);
+  }, _delay);
+  closeControl();
+});
+
+/* --------------- Command section --------------- */

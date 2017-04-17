@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1024px" height="1024px" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 43.1 (39012) - http://www.bohemiancoding.com/sketch -->
+    <title>close-dark</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="close">
+            <rect id="Rectangle-2" x="0" y="0" width="1024" height="1024"></rect>
+            <path d="M512,380.764 L174.276,138.851 L29.215,242.78 L512,588.671 L994.785,242.78 L849.655,138.851 L512,380.764 Z M512,677.242 L174.276,435.329 L29.215,539.258 L512,885.149 L994.785,539.258 L849.655,435.329 L512,677.242 Z" id="Shape" fill-opacity="0.4" fill="#FFFFFF" fill-rule="nonzero"></path>
+        </g>
+    </g>
+</svg>
