@@ -210,5 +210,3 @@ addTapEventFor(reverseButton, () => {
   }, _delay);
   closeControl();
 });
-
-/* --------------- Command section --------------- */
