@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 /* global document randomCube executeCommands reverseCommands */
 /* eslint no-console: off, strict: off, no-underscore-dangle: off*/
 
@@ -59,7 +60,7 @@ function closeControl() {
 
 /**
  * 开启控制台
- * @param  {[HTMLElement]} element
+ * @param  {HTMLElement} element
  * @return undefined
  */
 function openControl(element) {
@@ -138,7 +139,7 @@ addViewEvents();
 /* --------------- Switch control --------------- */
 const switchArray = document.querySelectorAll('.toolkit-switch');
 
-function toggleSwitch(event) {
+function toggleSwitch() {
   const newValue = this.getAttribute('value') === 'on' ? 'off' : 'on';
   this.setAttribute('value', newValue);
 }

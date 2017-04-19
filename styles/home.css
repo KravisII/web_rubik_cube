@@ -33,7 +33,7 @@ a {
 
 input:focus,
 textarea {
-  -webkit-tap-highlight-color: none;
+  -webkit-tap-highlight-color: transparent;
   outline: none;
 }
 
@@ -127,9 +127,8 @@ textarea {
 .button-icon {
   height: 1.25em;
   width: 1.25em;
+  background: no-repeat center;
   background-size: 1.25em;
-  background-position: center;
-  background-repeat: no-repeat;
   opacity: 1;
 }
 
@@ -501,7 +500,7 @@ textarea {
   box-shadow: 0 3px 5px 0 rgba(0, 0, 0, .2);
   will-change: transform;
   transition: transform .2s var(--switch-time-func);
-  transform: translateX(calc(var(--switch-width) - var(--handle-size) - 3px));
+  transform: translateX( calc(var(--switch-width) - var(--handle-size) - 3px) );
 }
 
 .toolkit-switch[value="off"] .toolkit-handle {
