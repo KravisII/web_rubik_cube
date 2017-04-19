@@ -1,0 +1,23 @@
+.global-tips {
+  position: fixed;
+  top: 96px;
+  width: 100%;
+  text-align: center;
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+}
+
+.global-tips.disable {
+  display: none;
+}
+
+.global-tips-inner {
+  font-size: 48px;
+  width: 80px;
+  height: 80px;
+  border-radius: 100%;
+  border: 1px solid black;
+  line-height: 80px;
+  background: #FFFFFF;
+}

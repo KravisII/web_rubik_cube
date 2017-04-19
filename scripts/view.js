@@ -189,13 +189,36 @@ addTapEventFor(randomButton, () => {
   textArea.value = randomCube(20);
 });
 
+// TEMP
+function timeOut(a) {
+  console.log(a);
+  // if (a > )
+  requestAnimationFrame(timeOut);
+}
+function addTips(time) {
+  let tips = document.querySelector('.global-tips');
+  let tipInner = document.querySelector('.global-tips-inner');
+  tipInner.innerText = time;
+  tips.classList.remove('disable');
+  for (let i = time; i > 0; i -= 1) {
+    ((i) => {
+      setTimeout(function() {
+        tipInner.innerText = time - i;
+      }, i * 1000);
+    })(i);
+  }
+}
+
 // TODO: 合并下列代码
 addTapEventFor(exectueButton, () => {
   // TODO: 检测合法性
   const _command = textArea.value;
   // TODO: 加入倒计时提示
   const _delay = delaySlider.value * 1000;
+  addTips(delaySlider.value);
   setTimeout(() => {
+    let tips = document.querySelector('.global-tips');
+    tips.classList.add('disable');
     executeCommands(_command);
   }, _delay);
   closeControl();
