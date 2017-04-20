@@ -1,6 +1,13 @@
 <!DOCTYPE html>
 <html lang='zh-cmn-Hans'>
+<!--TODO: 加入教学提示，例如：恢复底层十字-->
+<!--TODO: 加入教学提示开关-->
+<!--TODO: 完成恢复算法-->
+<!--TODO: 完成数据库-->
+<!--TODO: 完成历史记录-->
 
+<!--DREAM: 加入动画-->
+<!--DREAM: 桌面版将控制栏显示在右侧-->
 <head>
 	<meta charset='utf-8'>
 	<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" id="viewport">
@@ -17,7 +24,10 @@
 	</div>
 </header>
 <div class="global-tips disable">
-	<div class="global-tips-inner">~</div>
+	<div class="global-tips-inner">
+		<div class="gt-error disable"></div>
+		<div class="gt-countdown disable"></div>
+	</div>
 </div>
 <div class="canvas-wrapper absolute-frame">
 	<canvas class="main-canvas"></canvas>
@@ -121,7 +131,7 @@
 							<!-- TODO: Init -->
 							<span id="delay-value">undefined</span>
 						</div>
-						<input type="range" class="toolkit-slider" id="delay-slider" min="1" max="10" step="1" value="3">
+						<input type="range" class="toolkit-slider" id="delay-slider" min="0" max="10" step="1" value="3">
 					</div>
 				</div>
 			</section>
@@ -133,19 +143,19 @@
 		<ul class="gf-icon-list">
 			<li class="gf-list-item user">
 				<span class="user button-icon"></span>
-				<spna class="user button-text">User</spna>
+				<span class="user button-text">User</span>
 			</li>
 			<li class="gf-list-item command">
 				<span class="command button-icon"></span>
-				<spna class="command button-text">Command</spna>
+				<span class="command button-text">Command</span>
 			</li>
 			<li class="gf-list-item history">
 				<span class="history button-icon"></span>
-				<spna class="history button-text">History</spna>
+				<span class="history button-text">History</span>
 			</li>
 			<li class="gf-list-item setting">
 				<span class="setting button-icon"></span>
-				<spna class="setting button-text">Setting</spna>
+				<span class="setting button-text">Setting</span>
 			</li>
 		</ul>
 	</div>
@@ -155,6 +165,7 @@
 <script type="text/javascript" src="./scripts/lib/OrbitControls.js"></script>
 <script type="text/javascript" src="./scripts/lib/stats.min.js"></script>
 <script type="text/javascript" src="./scripts/home.js"></script>
+<script type="text/javascript" src="./scripts/tip.js"></script>
 <script type="text/javascript" src="./scripts/view.js"></script>
 </body>
 
