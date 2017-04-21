@@ -1,11 +1,14 @@
-/* eslint-disable no-restricted-syntax */
-/* global document randomCube executeCommands reverseCommands */
+/* eslint-disable no-restricted-syntax,max-len */
+/* global document TipControl randomCube executeCommands reverseCommands */
 /* eslint no-console: off, strict: off, no-underscore-dangle: off*/
 
 'use strict';
 
 /* Global value */
-// EMPTY NOW
+const tipControl = new TipControl();
+// let colors = ['#3498db', '#2ecc71', '#d35400', '#e74c3c', '#f39c12', '#9b59b6', '#34495e'];
+const colors = ['#ff3b30', '#ff9500', '#ffcc00', '#4cd964',
+  '#5ac8fa', '#007AFF', '#5856D6', '#FF2C55'];
 
 /* --------------- List item buttons --------------- */
 const curtain = document.querySelector('.curtain');
@@ -189,48 +192,60 @@ addTapEventFor(randomButton, () => {
   textArea.value = randomCube(20);
 });
 
-// TEMP
-function timeOut(a) {
-  console.log(a);
-  // if (a > )
-  requestAnimationFrame(timeOut);
+/**
+ * 检测命令的合法性
+ * @param str 命令
+ * @returns {boolean}
+ */
+function isCommandLegal(str) {
+  let result = true;
+  const array = str.split(' ');
+  for (const cmd of array) {
+    if (cmd.length === 1) {
+      if ((/[UFRDLB]/).test(cmd) === false) {
+        tipControl.showTip(`${cmd} is illegal command.`, 5000, 'error');
+        result = false;
+        break;
+      }
+    } else if (cmd.length === 2) {
+      if ((/[UFRDLB]'/).test(cmd) === false) {
+        tipControl.showTip(`${cmd} is illegal command.`, 5000, 'error');
+        result = false;
+        break;
+      }
+    } else {
+      tipControl.showTip(`Wrong length of ${cmd} command.`, 5000, 'error');
+      result = false;
+      break;
+    }
+  }
+  return result;
 }
-function addTips(time) {
-  let tips = document.querySelector('.global-tips');
-  let tipInner = document.querySelector('.global-tips-inner');
-  tipInner.innerText = time;
-  tips.classList.remove('disable');
-  for (let i = time; i > 0; i -= 1) {
-    ((i) => {
-      setTimeout(function() {
-        tipInner.innerText = time - i;
-      }, i * 1000);
-    })(i);
+
+/**
+ * 「加入倒计时」并「调用执行正转和逆转的函数」
+ * @param type
+ */
+function onExecuteButtonClick(type) {
+  const _command = textArea.value;
+  if (isCommandLegal(_command)) {
+    const _delay = delaySlider.value;
+    tipControl.showCountdown(_delay);
+    setTimeout(() => {
+      if (type === 'execute') {
+        executeCommands(_command);
+      } else if (type === 'reverse') {
+        reverseCommands(_command);
+      }
+    }, _delay * 1000);
+    closeControl();
   }
 }
 
-// TODO: 合并下列代码
 addTapEventFor(exectueButton, () => {
-  // TODO: 检测合法性
-  const _command = textArea.value;
-  // TODO: 加入倒计时提示
-  const _delay = delaySlider.value * 1000;
-  addTips(delaySlider.value);
-  setTimeout(() => {
-    let tips = document.querySelector('.global-tips');
-    tips.classList.add('disable');
-    executeCommands(_command);
-  }, _delay);
-  closeControl();
+  onExecuteButtonClick('execute');
 });
 
 addTapEventFor(reverseButton, () => {
-  // TODO: 检测合法性
-  const _command = textArea.value;
-  // TODO: 加入倒计时提示
-  const _delay = delaySlider.value * 1000;
-  setTimeout(() => {
-    reverseCommands(_command);
-  }, _delay);
-  closeControl();
+  onExecuteButtonClick('reverse');
 });

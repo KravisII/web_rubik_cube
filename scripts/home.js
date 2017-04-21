@@ -15,9 +15,8 @@
 const Cube = {};
 
 Object.defineProperty(Cube, 'duration', {
-  get: function() {
+  get: function getDuration() {
     const durationSlider = document.querySelector('#duration-slider');
-    console.log(durationSlider.value);
     return durationSlider.value;
   },
 });
