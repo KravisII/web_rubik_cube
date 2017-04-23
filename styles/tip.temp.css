@@ -1,46 +1,39 @@
 .global-tips {
-    position: fixed;
-    top: 96px;
-    width: 100%;
-    text-align: center;
-    z-index: 1000;
-    display: flex;
-    justify-content: center;
-    color: #FFFFFF;
+  position: fixed;
+  top: 96px;
+  width: 100%;
+  text-align: center;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  color: #FFFFFF;
 }
 
 .global-tips.disable {
-    display: none;
+  display: none;
 }
 
 .global-tips-inner {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    /*font-size: 48px;*/
-    /*width: 80px;*/
-    /*height: 80px;*/
-    /*border-radius: 100%;*/
-    /*border: 1px solid black;*/
-    /*line-height: 80px;*/
-    /*background: #FFFFFF;*/
+  width: 100%;
+  display: flex;
+  justify-content: center;
 }
 
 .gt-error {
-    background: #ff3b30;
-    font-size: 1.5em;
-    line-height: 3em;
-    position: relative;
-    left: 0;
-    right: 0;
-    width: 100%;
+  background: #ff3b30;
+  font-size: 1.5em;
+  line-height: 3em;
+  position: relative;
+  left: 0;
+  right: 0;
+  width: 100%;
 }
 
 .gt-countdown {
-    font-size: 48px;
-    height: 80px;
-    width: 80px;
-    line-height: 80px;
-    background: #007AFF;
-    border-radius: 100%;
+  font-size: 48px;
+  height: 80px;
+  width: 80px;
+  line-height: 80px;
+  background: #007AFF;
+  border-radius: 100%;
 }

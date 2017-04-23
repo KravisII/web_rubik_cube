@@ -8,7 +8,8 @@
 const tipControl = new TipControl();
 // let colors = ['#3498db', '#2ecc71', '#d35400', '#e74c3c', '#f39c12', '#9b59b6', '#34495e'];
 const colors = ['#ff3b30', '#ff9500', '#ffcc00', '#4cd964',
-  '#5ac8fa', '#007AFF', '#5856D6', '#FF2C55'];
+  '#5ac8fa', '#007AFF', '#5856D6', '#FF2C55'
+];
 
 /* --------------- List item buttons --------------- */
 const curtain = document.querySelector('.curtain');
@@ -26,7 +27,7 @@ const historySection = document.querySelector('.cw-sections > .history-section')
 const settingSection = document.querySelector('.cw-sections > .setting-section');
 
 /**
- * 添加点击事件
+ * 添加触屏事件
  * @param {HTMLElement} element 待添加的元素
  * @param {function} func 待绑定的函数名
  */
@@ -42,7 +43,6 @@ function addTapEventFor(element, func) {
 
 /**
  * 清除 .active 的 class
- * @return undefined
  */
 function clearAvtiveElements() {
   const elements = document.querySelectorAll('.active');
@@ -53,7 +53,6 @@ function clearAvtiveElements() {
 
 /**
  * 关闭控制台
- * @return undefined
  */
 function closeControl() {
   curtain.classList.add('disable');
@@ -64,7 +63,6 @@ function closeControl() {
 /**
  * 开启控制台
  * @param  {HTMLElement} element
- * @return undefined
  */
 function openControl(element) {
   curtain.classList.remove('disable');
@@ -93,7 +91,6 @@ function openControl(element) {
 
 /**
  * curtain 元素点击（触摸）事件
- * @return undefined
  */
 function curtainOnClick(event) {
   event.preventDefault();
@@ -102,7 +99,6 @@ function curtainOnClick(event) {
 
 /**
  * closeButton 按钮点击（触摸）事件
- * @return undefined
  */
 function closeButtonClick(event) {
   if (event) {
@@ -114,7 +110,6 @@ function closeButtonClick(event) {
 
 /**
  * tab 按钮的点击（触摸）事件
- * @return undefined
  */
 function tabButtonsClick(event) {
   event.preventDefault();
@@ -125,72 +120,148 @@ function tabButtonsClick(event) {
   }
 }
 
+/* --------------- User section --------------- */
+const signOutButton = document.querySelector('#sign-out-button');
+const signInButton = document.querySelector('#sign-in-button');
+const signUpButton = document.querySelector('#sign-up-button');
+const signUpLink = document.querySelector('#sign-up-link');
+const signInLink = document.querySelector('#sign-in-link');
+const userInfoPage = document.querySelector('.us-user-info');
+const signInPage = document.querySelector('.us-sign-in');
+const signUpPage = document.querySelector('.us-sign-up');
+
 /**
- * 添加所有页面事件
+ * 关闭 User section 的指定 page
+ * @param  {HTMLElement} page 需要关闭的页面
  */
-function addViewEvents() {
-  addTapEventFor(curtain, curtainOnClick);
-  addTapEventFor(closeButton, closeButtonClick);
-  const buttons = [userButton, commandButton, historyButton, settingButton];
-  for (const button of buttons) {
-    addTapEventFor(button, tabButtonsClick);
-  }
+function closePage(page) {
+  page.classList.remove('show');
 }
 
-addViewEvents();
+/**
+ * 打开 User section 的指定 page
+ * @param  {HTMLElement} page 需要打开的页面
+ */
+function openPage(page) {
+  page.classList.add('show');
+}
 
-/* --------------- Switch control --------------- */
+/**
+ * 关闭 User section 的所有 page
+ */
+function closeAllPages() {
+  closePage(userInfoPage);
+  closePage(signInPage);
+  closePage(signUpPage);
+}
+
+/**
+ * 退出登录
+ */
+function onSignOutButtonClick() {
+  closeAllPages();
+  openPage(signInPage);
+}
+
+/**
+ * 登录
+ */
+function onSignInButtonClick() {
+  closeAllPages();
+  openPage(userInfoPage);
+}
+
+/**
+ * 注册
+ */
+function onSignUpButtonClick() {
+  closeAllPages();
+  openPage(userInfoPage);
+}
+
+/**
+ * 打开注册页面
+ */
+function onSignUpLinkClick(event) {
+  event.preventDefault();
+  closeAllPages();
+  openPage(signUpPage);
+}
+
+/**
+ * 打开登陆页面
+ */
+function onSignInLinkClick(event) {
+  event.preventDefault();
+  closeAllPages();
+  openPage(signInPage);
+}
+
+/*
+
+<section class="user-section">
+  <div class="us-user-info show">
+    <div class="usui-name">Nick Name</div>
+    <div class="usui-email">youremail@example.com</div>
+    <div class="section-button sign-out" id="sign-out-button">Sign out</div>
+  </div>
+  <div class="us-sign-in">
+    <form>
+      <div class="us-sign-in-inner">
+        <label for="sign-in-email">Email address</label>
+        <input type="text" name="email" id="sign-in-email" class="inpu-area">
+        <label for="sign-in-password">Password</label>
+        <input type="password" name="password" id="sign-in-password" class="inpu-area">
+        <div class="section-button sign-in" id="sign-in-button">Sign in</div>
+      </div>
+    </form>
+    <p class="us-sign-in-tip">
+      <a href="#" id="create-account-link">Create an account</a> to save history and setting.
+    </p>
+  </div>
+  <div class="us-sign-up">
+    <form>
+      <div class="us-sign-up-inner">
+        <label for="sign-up-email">Email address</label>
+        <input type="text" name="email" id="sign-up-email" class="inpu-area">
+        <label for="sign-up-nickname">Nick name</label>
+        <input type="text" name="email" id="sign-up-nickname" class="inpu-area">
+        <label for="sign-up-password">Password</label>
+        <input type="password" name="password" id="sign-up-password" class="inpu-area">
+        <div class="section-button sign-up">Sign up</div>
+      </div>
+    </form>
+    <p class="us-sign-up-tip">
+      Already have an account? <a href="#" id="sign-in-link">Sign in.</a>
+    </p>
+  </div>
+</section>
+ */
+
+/* --------------- Setting section --------------- */
+// 由于其他 section 需要获取 setting section 的数据，因此需要将其放在此处
 const switchArray = document.querySelectorAll('.toolkit-switch');
+const themeSwitch = document.querySelector('#theme-switch');
+const durationSlider = document.querySelector('#duration-slider');
+const delaySlider = document.querySelector('#delay-slider');
+const durationValueSpan = document.querySelector('#duration-value');
+const delayValueSpan = document.querySelector('#delay-value');
 
-function toggleSwitch() {
+function toggleSwitch(event) {
+  event.preventDefault();
   const newValue = this.getAttribute('value') === 'on' ? 'off' : 'on';
   this.setAttribute('value', newValue);
 }
 
-for (const switchKit of switchArray) {
-  addTapEventFor(switchKit, toggleSwitch);
-}
-
-/* --------------- Slider(Setting) functions --------------- */
-const themeSwitch = document.querySelector('#theme-switch');
-
-const durationSlider = document.querySelector('#duration-slider');
-const delaySlider = document.querySelector('#delay-slider');
-
-const durationValueSpan = document.querySelector('#duration-value');
-const delayValueSpan = document.querySelector('#delay-value');
-
 durationValueSpan.innerText = durationSlider.value;
 delayValueSpan.innerText = delaySlider.value;
 
-addTapEventFor(themeSwitch, () => {
-  const themeValue = themeSwitch.getAttribute('value');
-  if (themeValue === 'on') {
-    document.querySelector('body').classList.add('dark');
-  } else {
-    document.querySelector('body').classList.remove('dark');
-  }
-});
-
-durationSlider.addEventListener('input', function func() {
-  durationValueSpan.innerText = this.value;
-}, false);
-
-delaySlider.addEventListener('input', function func() {
-  delayValueSpan.innerText = this.value;
-}, false);
-
 /* --------------- Command section --------------- */
-// TODO: 加入 iOS 的 return -> execute
 const textArea = document.querySelector('.cs-inner .inpu-area');
 
 const randomButton = document.querySelector('.section-button.random');
 const exectueButton = document.querySelector('.section-button.execute');
 const reverseButton = document.querySelector('.section-button.reverse');
-
-addTapEventFor(randomButton, () => {
-  textArea.value = randomCube(20);
-});
 
 /**
  * 检测命令的合法性
@@ -242,10 +313,54 @@ function onExecuteButtonClick(type) {
   }
 }
 
-addTapEventFor(exectueButton, () => {
-  onExecuteButtonClick('execute');
-});
+/* --------------- All events --------------- */
+/**
+ * 添加所有页面事件
+ */
+function addViewEvents() {
+  addTapEventFor(curtain, curtainOnClick);
+  addTapEventFor(closeButton, closeButtonClick);
+  const buttons = [userButton, commandButton, historyButton, settingButton];
+  for (const button of buttons) {
+    addTapEventFor(button, tabButtonsClick);
+  }
 
-addTapEventFor(reverseButton, () => {
-  onExecuteButtonClick('reverse');
-});
+  addTapEventFor(randomButton, () => {
+    textArea.value = randomCube(20);
+  });
+  addTapEventFor(exectueButton, () => {
+    onExecuteButtonClick('execute');
+  });
+
+  addTapEventFor(reverseButton, () => {
+    onExecuteButtonClick('reverse');
+  });
+
+  for (const switchKit of switchArray) {
+    addTapEventFor(switchKit, toggleSwitch);
+  }
+  addTapEventFor(themeSwitch, () => {
+    const themeValue = themeSwitch.getAttribute('value');
+    if (themeValue === 'on') {
+      document.querySelector('body').classList.add('dark');
+    } else {
+      document.querySelector('body').classList.remove('dark');
+    }
+  });
+
+  durationSlider.addEventListener('input', function func() {
+    durationValueSpan.innerText = this.value;
+  }, false);
+
+  delaySlider.addEventListener('input', function func() {
+    delayValueSpan.innerText = this.value;
+  }, false);
+
+  addTapEventFor(signOutButton, onSignOutButtonClick);
+  addTapEventFor(signInButton, onSignInButtonClick);
+  addTapEventFor(signUpButton, onSignUpButtonClick);
+  addTapEventFor(signUpLink, onSignUpLinkClick);
+  addTapEventFor(signInLink, onSignInLinkClick);
+}
+
+addViewEvents();

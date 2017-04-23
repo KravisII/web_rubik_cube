@@ -10,6 +10,7 @@ body {
   --border-color: #B3B2B3;
   --ios-border-width: 0.5px;
   --section-button-height: 2.75em;
+  -webkit-user-select: none;
   --tab-height: 3em;
   margin: 0;
   min-width: 320px;
@@ -44,8 +45,12 @@ textarea {
   overflow: hidden;
 }
 
+.disable {
+  display: none;
+}
 
-/* Header */
+
+/* Header and tip */
 
 .global-header {
   top: 0;
@@ -55,10 +60,6 @@ textarea {
   z-index: 10;
   box-sizing: border-box;
   height: var(--tab-height);
-}
-
-.disable {
-  display: none;
 }
 
 .center-frame {
@@ -106,6 +107,49 @@ textarea {
   color: #FFFFFF;
 }
 
+.global-tips {
+  position: fixed;
+  top: 96px;
+  width: 100%;
+  text-align: center;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  color: #FFFFFF;
+}
+
+.global-tips.disable {
+  display: none;
+}
+
+.global-tips-inner {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.gt-error {
+  background: #ff3b30;
+  font-size: 1.5em;
+  line-height: 3em;
+  position: relative;
+  left: 0;
+  right: 0;
+  width: 100%;
+}
+
+.gt-countdown {
+  font-size: 48px;
+  height: 80px;
+  width: 80px;
+  line-height: 80px;
+  background: #007AFF;
+  border-radius: 100%;
+}
+
+
+/* Main */
+
 .canvas-wrapper {
   width: 100%;
   display: flex;
@@ -117,19 +161,13 @@ textarea {
   padding: 0;
 }
 
-.gh-left {
-  /* color: inherit; */
-}
-
-
-/* Main */
-
 .button-icon {
   height: 1.25em;
   width: 1.25em;
   background: no-repeat center;
   background-size: 1.25em;
   opacity: 1;
+  cursor: pointer;
 }
 
 .button-icon.user {
@@ -248,6 +286,7 @@ textarea {
   height: 100%;
   box-sizing: border-box;
   padding: .5em 0 0;
+  cursor: pointer;
 }
 
 .gf-list-item.active {
@@ -500,7 +539,7 @@ textarea {
   box-shadow: 0 3px 5px 0 rgba(0, 0, 0, .2);
   will-change: transform;
   transition: transform .2s var(--switch-time-func);
-  transform: translateX( calc(var(--switch-width) - var(--handle-size) - 3px) );
+  transform: translateX( calc(var(--switch-width) - var(--handle-size) - 3px));
 }
 
 .toolkit-switch[value="off"] .toolkit-handle {

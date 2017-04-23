@@ -29,7 +29,6 @@ class TipControl {
 
   closeTip() {
     const inners = this.gtInner.querySelectorAll("[class|='gt']");
-    console.log(inners);
     for (const element of inners) {
       element.classList.add('disable');
     }

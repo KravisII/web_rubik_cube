@@ -5,168 +5,174 @@
 <!--TODO: 完成恢复算法-->
 <!--TODO: 完成数据库-->
 <!--TODO: 完成历史记录-->
+<!--MAYBE: 加入动画-->
+<!--MAYBE: 桌面版将控制栏显示在右侧-->
 
-<!--DREAM: 加入动画-->
-<!--DREAM: 桌面版将控制栏显示在右侧-->
 <head>
-	<meta charset='utf-8'>
-	<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" id="viewport">
-	<title>Web Rubik's Cube</title>
-	<link rel="stylesheet" type="text/css" href="./styles/home.css">
-	<link rel="stylesheet" type="text/css" href="./styles/tip.temp.css">
+  <meta charset='utf-8'>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>Web Rubik's Cube</title>
+  <link rel="stylesheet" type="text/css" href="./styles/home.css">
+  <link rel="stylesheet" type="text/css" href="./styles/tip.temp.css">
 </head>
 
 <body>
-<header class="global-header bg-blur absolute-frame">
-	<div class="gh-wrapper center-frame">
-		<div class="gh-left">Rubik's Cube</div>
-		<div class="gh-right"></div>
-	</div>
-</header>
-<div class="global-tips disable">
-	<div class="global-tips-inner">
-		<div class="gt-error disable"></div>
-		<div class="gt-countdown disable"></div>
-	</div>
-</div>
-<div class="canvas-wrapper absolute-frame">
-	<canvas class="main-canvas"></canvas>
-</div>
-<div class="curtain absolute-frame disable"></div>
-<div class="control-wrapper bg-blur absolute-frame disable">
-	<header class="cw-header">
-		<div class="cw-header-inner center-frame">
-			<span class="close button-icon"></span>
-		</div>
-	</header>
-	<div class="cw-inner center-frame">
-		<div class="cw-sections">
-			<section class="user-section">
-				<div class="us-user-info show">
-					<div class="usui-name">Nick Name</div>
-					<div class="usui-email">youremail@example.com</div>
-					<div class="section-button sign-out">Sign out</div>
-				</div>
-				<div class="us-sign-in">
-					<form>
-						<div class="us-sign-in-inner">
-							<label for="sign-in-email">Email address</label>
-							<input type="text" name="email" id="sign-in-email" class="inpu-area">
-							<label for="sign-in-password">Password</label>
-							<input type="password" name="password" id="sign-in-password" class="inpu-area">
-							<div class="section-button sign-in">Sign in</div>
-						</div>
-					</form>
-					<p class="us-sign-in-tip">
-						<a href="#">Create an account</a> to save history and setting.
-					</p>
-				</div>
-				<div class="us-sign-up">
-					<form>
-						<div class="us-sign-up-inner">
-							<label for="sign-up-email">Email address</label>
-							<input type="text" name="email" id="sign-up-email" class="inpu-area">
-							<label for="sign-up-nickname">Nick name</label>
-							<input type="text" name="email" id="sign-up-nickname" class="inpu-area">
-							<label for="sign-up-password">Password</label>
-							<input type="password" name="password" id="sign-up-password" class="inpu-area">
-							<div class="section-button sign-up">Sign up</div>
-						</div>
-					</form>
-					<p class="us-sign-up-tip">
-						Already have an account? <a href="#">Sign in.</a>
-					</p>
-				</div>
-			</section>
-			<section class="command-section">
-				<div class="cs-inner">
-					<span class="cs-inner-label">Commands</span>
-					<textarea class="inpu-area"></textarea>
-					<div class="section-button random">Generate random commands</div>
-					<div class="section-button execute">Execute</div>
-					<div class="section-button reverse">Reverse</div>
-				</div>
-			</section>
-			<section class="history-section">
-				<p>This is history-section. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Recusandae temporibus
-					ut.</p>
-			</section>
-			<section class="setting-section">
-				<div class="ss-inner">
-					<div class="ss-group theme">
-						<div class="toolkit-label">Theme</div>
-						<div class="toolkit-switch" value="off" id="theme-switch">
-							<span class="toolkit-switch-label on">Dark</span>
-							<span class="toolkit-switch-label off">Light</span>
-							<span class="toolkit-handle"></span>
-						</div>
-					</div>
-					<div class="ss-group facecode">
-						<div class="toolkit-label">Facecode</div>
-						<div class="toolkit-switch" value="on" id="facecode-switch">
-							<span class="toolkit-switch-label on">Show</span>
-							<span class="toolkit-switch-label off">Hide</span>
-							<span class="toolkit-handle"></span>
-						</div>
-					</div>
-					<div class="ss-group language">
-						<div class="toolkit-label">Language</div>
-						<div class="toolkit-switch" value="off" id="language-switch">
-							<span class="toolkit-switch-label on">中</span>
-							<span class="toolkit-switch-label off">Eng</span>
-							<span class="toolkit-handle"></span>
-						</div>
-					</div>
-					<div class="ss-group duration">
-						<div class="toolkit-label">
-							<span>Duration</span>
-							<!-- TODO: Init -->
-							<span id="duration-value">undefined</span>
-						</div>
-						<input type="range" class="toolkit-slider" id="duration-slider" min="300" max="3000" step="100" value="800">
-					</div>
-					<div class="ss-group delay">
-						<div class="toolkit-label">
-							<span>Delay</span>
-							<!-- TODO: Init -->
-							<span id="delay-value">undefined</span>
-						</div>
-						<input type="range" class="toolkit-slider" id="delay-slider" min="0" max="10" step="1" value="3">
-					</div>
-				</div>
-			</section>
-		</div>
-	</div>
-</div>
-<footer class="global-footer bg-blur absolute-frame">
-	<div class="gf-wrapper center-frame">
-		<ul class="gf-icon-list">
-			<li class="gf-list-item user">
-				<span class="user button-icon"></span>
-				<span class="user button-text">User</span>
-			</li>
-			<li class="gf-list-item command">
-				<span class="command button-icon"></span>
-				<span class="command button-text">Command</span>
-			</li>
-			<li class="gf-list-item history">
-				<span class="history button-icon"></span>
-				<span class="history button-text">History</span>
-			</li>
-			<li class="gf-list-item setting">
-				<span class="setting button-icon"></span>
-				<span class="setting button-text">Setting</span>
-			</li>
-		</ul>
-	</div>
-</footer>
-<script type="text/javascript" src="./scripts/lib/three.min.js"></script>
-<script type="text/javascript" src="./scripts/lib/Tween.min.js"></script>
-<script type="text/javascript" src="./scripts/lib/OrbitControls.js"></script>
-<script type="text/javascript" src="./scripts/lib/stats.min.js"></script>
-<script type="text/javascript" src="./scripts/home.js"></script>
-<script type="text/javascript" src="./scripts/tip.js"></script>
-<script type="text/javascript" src="./scripts/view.js"></script>
+  <header class="global-header bg-blur absolute-frame">
+    <div class="gh-wrapper center-frame">
+      <div class="gh-left">Rubik's Cube</div>
+      <div class="gh-right"></div>
+    </div>
+  </header>
+  <div class="global-tips disable">
+    <div class="global-tips-inner">
+      <div class="gt-error disable"></div>
+      <div class="gt-countdown disable"></div>
+    </div>
+  </div>
+  <div class="canvas-wrapper absolute-frame">
+    <canvas class="main-canvas"></canvas>
+  </div>
+  <div class="curtain absolute-frame disable"></div>
+  <div class="control-wrapper bg-blur absolute-frame disable">
+    <header class="cw-header">
+      <div class="cw-header-inner center-frame">
+        <span class="close button-icon"></span>
+      </div>
+    </header>
+    <div class="cw-inner center-frame">
+      <div class="cw-sections">
+        <section class="user-section">
+          <div class="us-user-info show">
+            <div class="usui-name">Nick Name</div>
+            <div class="usui-email">youremail@example.com</div>
+            <div class="section-button sign-out" id="sign-out-button">Sign out</div>
+          </div>
+          <div class="us-sign-in">
+            <form>
+              <div class="us-sign-in-inner">
+                <label for="sign-in-email">Email address</label>
+                <input type="text" name="email" id="sign-in-email" class="inpu-area">
+                <label for="sign-in-password">Password</label>
+                <input type="password" name="password" id="sign-in-password" class="inpu-area">
+                <div class="section-button sign-in" id="sign-in-button">Sign in</div>
+              </div>
+            </form>
+            <p class="us-sign-in-tip">
+              <a href="#" id="sign-up-link">Create an account</a> to save history and setting.
+            </p>
+          </div>
+          <div class="us-sign-up">
+            <form>
+              <div class="us-sign-up-inner">
+                <label for="sign-up-email">Email address</label>
+                <input type="text" name="email" id="sign-up-email" class="inpu-area">
+                <label for="sign-up-nickname">Nick name</label>
+                <input type="text" name="email" id="sign-up-nickname" class="inpu-area">
+                <label for="sign-up-password">Password</label>
+                <input type="password" name="password" id="sign-up-password" class="inpu-area">
+                <div class="section-button sign-up" id="sign-up-button">Sign up</div>
+              </div>
+            </form>
+            <p class="us-sign-up-tip">
+              Already have an account? <a href="#" id="sign-in-link">Sign in.</a>
+            </p>
+          </div>
+        </section>
+        <section class="command-section">
+          <div class="cs-inner">
+            <span class="cs-inner-label">Commands</span>
+            <textarea class="inpu-area"></textarea>
+            <div class="section-button random">Generate random commands</div>
+            <div class="section-button execute">Execute</div>
+            <div class="section-button reverse">Reverse</div>
+          </div>
+        </section>
+        <section class="history-section">
+          <p>This is history-section. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Recusandae temporibus ut.
+          </p>
+        </section>
+        <section class="setting-section">
+          <div class="ss-inner">
+            <div class="ss-group theme">
+              <div class="toolkit-label">Theme</div>
+              <div class="toolkit-switch" value="off" id="theme-switch">
+                <span class="toolkit-switch-label on">Dark</span>
+                <span class="toolkit-switch-label off">Light</span>
+                <span class="toolkit-handle"></span>
+              </div>
+            </div>
+            <div class="ss-group facecode">
+              <div class="toolkit-label">Facecode</div>
+              <div class="toolkit-switch" value="on" id="facecode-switch">
+                <span class="toolkit-switch-label on">Show</span>
+                <span class="toolkit-switch-label off">Hide</span>
+                <span class="toolkit-handle"></span>
+              </div>
+            </div>
+            <div class="ss-group language">
+              <div class="toolkit-label">Language</div>
+              <div class="toolkit-switch" value="off" id="language-switch">
+                <span class="toolkit-switch-label on">中</span>
+                <span class="toolkit-switch-label off">Eng</span>
+                <span class="toolkit-handle"></span>
+              </div>
+            </div>
+            <div class="ss-group tip">
+              <div class="toolkit-label">Tip</div>
+              <div class="toolkit-switch" value="off" id="tip-switch">
+                <span class="toolkit-switch-label on">Show</span>
+                <span class="toolkit-switch-label off">Hide</span>
+                <span class="toolkit-handle"></span>
+              </div>
+            </div>
+            <div class="ss-group duration">
+              <div class="toolkit-label">
+                <span>Duration</span>
+                <span id="duration-value">undefined</span>
+              </div>
+              <input type="range" class="toolkit-slider" id="duration-slider" min="300" max="3000" step="100" value="800">
+            </div>
+            <div class="ss-group delay">
+              <div class="toolkit-label">
+                <span>Delay</span>
+                <span id="delay-value">undefined</span>
+              </div>
+              <input type="range" class="toolkit-slider" id="delay-slider" min="0" max="10" step="1" value="3">
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+  <footer class="global-footer bg-blur absolute-frame">
+    <div class="gf-wrapper center-frame">
+      <ul class="gf-icon-list">
+        <li class="gf-list-item user">
+          <span class="user button-icon"></span>
+          <span class="user button-text">User</span>
+        </li>
+        <li class="gf-list-item command">
+          <span class="command button-icon"></span>
+          <span class="command button-text">Command</span>
+        </li>
+        <li class="gf-list-item history">
+          <span class="history button-icon"></span>
+          <span class="history button-text">History</span>
+        </li>
+        <li class="gf-list-item setting">
+          <span class="setting button-icon"></span>
+          <span class="setting button-text">Setting</span>
+        </li>
+      </ul>
+    </div>
+  </footer>
+  <script type="text/javascript" src="./scripts/lib/three.min.js"></script>
+  <script type="text/javascript" src="./scripts/lib/Tween.min.js"></script>
+  <script type="text/javascript" src="./scripts/lib/OrbitControls.js"></script>
+  <script type="text/javascript" src="./scripts/lib/stats.min.js"></script>
+  <script type="text/javascript" src="./scripts/home.js"></script>
+  <script type="text/javascript" src="./scripts/tip.js"></script>
+  <script type="text/javascript" src="./scripts/view.js"></script>
 </body>
 
 </html>
