@@ -14,6 +14,11 @@ body {
   --tab-height: 3em;
   margin: 0;
   min-width: 320px;
+  --dark-time-func: ease;
+  --dark-time-dura: 0.5s;
+  /* Dark transition */
+  will-change: background;
+  transition: background var(--dark-time-dura) var(--dark-time-func);
 }
 
 body.dark {
@@ -38,7 +43,6 @@ textarea {
   outline: none;
 }
 
-
 /* Status */
 
 .disable-scroll {
@@ -49,9 +53,7 @@ textarea {
   display: none;
 }
 
-
 /* Header and tip */
-
 .global-header {
   top: 0;
   left: 0;
@@ -77,6 +79,9 @@ textarea {
   background: rgba(255, 255, 255, 1);
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
+  /* Dark transition */
+  will-change: background;
+  transition: background 0.4s var(--dark-time-func);
 }
 
 .dark .bg-blur {
@@ -88,7 +93,11 @@ textarea {
     background: rgba(255, 255, 255, .8);
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
+    /* Dark transition */
+    will-change: background;
+    transition: background 0.4s var(--dark-time-func);
   }
+
   .dark .bg-blur {
     background: rgba(0, 0, 0, .8);
   }
@@ -101,6 +110,9 @@ textarea {
   justify-content: space-between;
   height: 100%;
   cursor: default;
+  /* Dark transition */
+  will-change: color;
+  transition: color var(--dark-time-dura) var(--dark-time-func);
 }
 
 .dark .gh-wrapper {
@@ -116,10 +128,6 @@ textarea {
   display: flex;
   justify-content: center;
   color: #FFFFFF;
-}
-
-.global-tips.disable {
-  display: none;
 }
 
 .global-tips-inner {
@@ -146,7 +154,6 @@ textarea {
   background: #007AFF;
   border-radius: 100%;
 }
-
 
 /* Main */
 
@@ -223,12 +230,37 @@ textarea {
   background: rgba(0, 0, 0, 0);
 }
 
+.curtain.disable {
+  display: none;
+}
+
+@keyframes slide-up {
+  0% {
+    display: none;
+    opacity: 0;
+    transform: translateY(-10000px);
+  }
+  0.1% {
+    display: block;
+    opacity: 0;
+    transform: translateY(100%);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .control-wrapper {
   z-index: 20;
   bottom: var(--tab-height);
   left: 0;
   right: 0;
   border-top: var(--ios-border-width) solid var(--border-color);
+  will-change: color, display, opacity, transform;
+  animation: slide-up 0.4s;
+  transition: color var(--dark-time-dura) var(--dark-time-func);
 }
 
 .dark .control-wrapper {
@@ -539,7 +571,7 @@ textarea {
   box-shadow: 0 3px 5px 0 rgba(0, 0, 0, .2);
   will-change: transform;
   transition: transform .2s var(--switch-time-func);
-  transform: translateX( calc(var(--switch-width) - var(--handle-size) - 3px));
+  transform: translateX(calc(var(--switch-width) - var(--handle-size) - 3px));
 }
 
 .toolkit-switch[value="off"] .toolkit-handle {
