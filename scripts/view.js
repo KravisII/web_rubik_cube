@@ -197,47 +197,6 @@ function onSignInLinkClick(event) {
   openPage(signInPage);
 }
 
-/*
-
-<section class="user-section">
-  <div class="us-user-info show">
-    <div class="usui-name">Nick Name</div>
-    <div class="usui-email">youremail@example.com</div>
-    <div class="section-button sign-out" id="sign-out-button">Sign out</div>
-  </div>
-  <div class="us-sign-in">
-    <form>
-      <div class="us-sign-in-inner">
-        <label for="sign-in-email">Email address</label>
-        <input type="text" name="email" id="sign-in-email" class="inpu-area">
-        <label for="sign-in-password">Password</label>
-        <input type="password" name="password" id="sign-in-password" class="inpu-area">
-        <div class="section-button sign-in" id="sign-in-button">Sign in</div>
-      </div>
-    </form>
-    <p class="us-sign-in-tip">
-      <a href="#" id="create-account-link">Create an account</a> to save history and setting.
-    </p>
-  </div>
-  <div class="us-sign-up">
-    <form>
-      <div class="us-sign-up-inner">
-        <label for="sign-up-email">Email address</label>
-        <input type="text" name="email" id="sign-up-email" class="inpu-area">
-        <label for="sign-up-nickname">Nick name</label>
-        <input type="text" name="email" id="sign-up-nickname" class="inpu-area">
-        <label for="sign-up-password">Password</label>
-        <input type="password" name="password" id="sign-up-password" class="inpu-area">
-        <div class="section-button sign-up">Sign up</div>
-      </div>
-    </form>
-    <p class="us-sign-up-tip">
-      Already have an account? <a href="#" id="sign-in-link">Sign in.</a>
-    </p>
-  </div>
-</section>
- */
-
 /* --------------- Setting section --------------- */
 // 由于其他 section 需要获取 setting section 的数据，因此需要将其放在此处
 const switchArray = document.querySelectorAll('.toolkit-switch');
